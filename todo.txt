@@ -1,0 +1,7 @@
+TODO:
+* Load transactions from file
+* Display transactions in "new transactions" view
+* Save transactions from "new transactions" view to main transaction list
+* Display main transaction list
+
+DONE:
