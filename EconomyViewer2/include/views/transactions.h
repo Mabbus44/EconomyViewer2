@@ -3,6 +3,7 @@
 
 #include <QFrame>
 #include <QPushButton>
+#include <QTableWidget>
 #include "../core/constants.h"
 
 namespace views{
@@ -14,6 +15,7 @@ public:
     Transactions();
     Transactions(QWidget* parent);
     QPushButton btnAddTransactions;
+    QTableWidget tblTransactions;
 private:
     void createViewElements();
 

@@ -13,11 +13,14 @@ int EconomyViewer::run(int argc, char **argv) {
 
     transactionsView.reset(new views::Transactions(window.get()));
     QObject::connect(transactionsView.get(), &views::Transactions::changedView, this, &EconomyViewer::openNewView);
+    updateTransactionsTable();
     transactionsView->show();
     currentView = ViewNames::TRANSACTIONS;
 
     newTransactionsView.reset(new views::NewTransactions(window.get()));
     QObject::connect(newTransactionsView.get(), &views::NewTransactions::changedView, this, &EconomyViewer::openNewView);
+    QObject::connect(newTransactionsView.get(), &views::NewTransactions::addNewTransactions, this, &EconomyViewer::addNewTransactions);
+
     newTransactionsView->hide();
 
     return app.exec();
@@ -47,19 +50,23 @@ void EconomyViewer::closeCurrentView(){
 
 void EconomyViewer::openNewView(ViewNames viewName){
     if(!window){
-        showErrorMessage("Cannot open view without a window");
+        Utils::showErrorMessage("Cannot open view without a window");
         return;
     }
 
-    closeCurrentView();
     switch(viewName){
     case ViewNames::TRANSACTIONS:
+        closeCurrentView();
+        updateTransactionsTable();
         transactionsView->show();
         currentView = ViewNames::TRANSACTIONS;
         break;
     case ViewNames::NEW_TRANSACTIONS:
-        newTransactionsView->show();
-        currentView = ViewNames::NEW_TRANSACTIONS;
+        if(newTransactionsView->loadTransactions()){
+            closeCurrentView();
+            newTransactionsView->show();
+            currentView = ViewNames::NEW_TRANSACTIONS;
+        }
         break;
     case ViewNames::MANAGE_ACCOUNTS:
         break;
@@ -72,6 +79,27 @@ void EconomyViewer::openNewView(ViewNames viewName){
     default:
         break;
     }
+}
+
+void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions){
+    for(Transaction& trans: newTransactions)
+        transactions.push_back(trans);
+}
+
+void EconomyViewer::updateTransactionsTable(){
+    // Populate the table
+    transactionsView->tblTransactions.setRowCount(transactions.size());
+    transactionsView->tblTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT);
+    transactionsView->tblTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
+    int row = 0;
+    for(core::Transaction& transaction: transactions){
+        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::TRANSACTION_DATE, new QTableWidgetItem(transaction.getTransactionDateAsString().c_str()));
+        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::TRANSACTION_AMOUNT, new QTableWidgetItem(transaction.getTransactionAmountAsString().c_str()));
+        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::BALANCE, new QTableWidgetItem(transaction.getBalanceAsString().c_str()));
+        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
+        row++;
+    }
+    transactionsView->tblTransactions.resizeColumnsToContents();
 }
 
 }

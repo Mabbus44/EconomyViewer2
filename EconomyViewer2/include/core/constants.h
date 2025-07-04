@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 #include <string>
 #include <QMessageBox>
+#include <ctime>
 
 namespace core{
 
@@ -15,7 +16,27 @@ enum ViewNames{
     CHANGE_TRANSACTIONS
 };
 
-void showErrorMessage(std::string text);
+enum TransactionColumns{
+    TRANSACTION_DATE = 0,
+    TRANSACTION_AMOUNT = 1,
+    BALANCE = 2,
+    DESCRIPTION = 3,
+    COLUMN_COUNT = 4,
+};
+
+class Utils{
+public:
+    Utils(){};
+    ~Utils(){};
+    static void showErrorMessage(std::string text);
+    static std::vector<std::string> splitString(const std::string& s, const std::string& delimiter);
+    static bool isDate(std::string str);
+    static bool isNum(std::string str);
+    static std::tm toDate(std::string str);
+    static double toNum(std::string str);
+    static std::vector<std::tuple<int, int>> sortKeysByVal(std::map<int, int>& inputMap);
+};
+
 
 }
 #endif // CONSTANTS_H

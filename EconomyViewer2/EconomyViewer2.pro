@@ -5,11 +5,12 @@ QT = core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
 INCLUDEPATH += include
 
 SOURCES += \
+    src/core/importedrow.cpp \
     src/core/constants.cpp \
     src/core/economyviewer.cpp \
     src/core/transaction.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     include/core/constants.h \
     include/core/economyviewer.h \
+    include/core/importedrow.h \
     include/core/transaction.h \
     include/views/newtransactions.h \
     include/views/transactions.h

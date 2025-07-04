@@ -1,7 +1,11 @@
 TODO:
-* Load transactions from file
-* Display transactions in "new transactions" view
-* Save transactions from "new transactions" view to main transaction list
-* Display main transaction list
+* Make transactions table fit columns, but max window width
+* Check that dates is an actual date and not just any numbers in format xxxx-xx-xx
 
 DONE:
+v0.01
+* Load transactions from file
+* Display transactions in "new transactions" view
+* Check format for transaction table cells
+* Save transactions from "new transactions" view to main transaction list
+* Display main transaction list

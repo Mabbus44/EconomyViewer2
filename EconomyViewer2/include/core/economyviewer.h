@@ -19,13 +19,15 @@ public:
     void closeCurrentView();
 
     ViewNames currentView = ViewNames::NONE;
-    std::vector<std::shared_ptr<Transaction>> transactions;
+    std::vector<Transaction> transactions;
     QScopedPointer<views::Transactions> transactionsView;
     QScopedPointer<views::NewTransactions> newTransactionsView;
     QScopedPointer<QFrame> window;
+    void updateTransactionsTable();
 
 public slots:
     void openNewView(ViewNames viewName);
+    void addNewTransactions(std::vector<Transaction>& newTransactions);
 };
 
 }
