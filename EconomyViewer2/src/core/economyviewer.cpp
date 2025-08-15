@@ -12,16 +12,20 @@ int EconomyViewer::run(int argc, char **argv) {
     window->show();
 
     transactionsView.reset(new views::Transactions(window.get()));
-    QObject::connect(transactionsView.get(), &views::Transactions::changedView, this, &EconomyViewer::openNewView);
-    updateTransactionsTable();
-    transactionsView->show();
+    QObject::connect(transactionsView.get(), &views::Transactions::openNewTransactionsView, this, &EconomyViewer::openNewTransactionsView);
+    QObject::connect(transactionsView.get(), &views::Transactions::openAccountsView, this, &EconomyViewer::openAccountsView);
+    transactionsView->openView();
     currentView = ViewNames::TRANSACTIONS;
 
     newTransactionsView.reset(new views::NewTransactions(window.get()));
-    QObject::connect(newTransactionsView.get(), &views::NewTransactions::changedView, this, &EconomyViewer::openNewView);
+    QObject::connect(newTransactionsView.get(), &views::NewTransactions::openTransactionsView, this, &EconomyViewer::openTransactionsView);
     QObject::connect(newTransactionsView.get(), &views::NewTransactions::addNewTransactions, this, &EconomyViewer::addNewTransactions);
-
     newTransactionsView->hide();
+
+    accountsView.reset(new views::Accounts(window.get()));
+    QObject::connect(accountsView.get(), &views::Accounts::openTransactionsView, this, &EconomyViewer::openTransactionsView);
+    QObject::connect(accountsView.get(), &views::Accounts::updateAccounts, this, &EconomyViewer::updateAccounts);
+    accountsView->hide();
 
     return app.exec();
 }
@@ -35,6 +39,7 @@ void EconomyViewer::closeCurrentView(){
         newTransactionsView->hide();
         break;
     case ViewNames::MANAGE_ACCOUNTS:
+        accountsView->hide();
         break;
     case ViewNames::TRANSACTIONS_GROUPS:
         break;
@@ -48,37 +53,41 @@ void EconomyViewer::closeCurrentView(){
     currentView = ViewNames::NONE;
 }
 
-void EconomyViewer::openNewView(ViewNames viewName){
-    if(!window){
-        Utils::showErrorMessage("Cannot open view without a window");
-        return;
-    }
+void EconomyViewer::openTransactionsViewAndAddTransactions(std::vector<Transaction>& transactions){
+    closeCurrentView();
+    transactionsView->openView(transactions);
+    currentView = ViewNames::TRANSACTIONS;
+}
 
-    switch(viewName){
-    case ViewNames::TRANSACTIONS:
+void EconomyViewer::openTransactionsView(bool useCoreTransactionVector){
+    closeCurrentView();
+    if(useCoreTransactionVector)
+        transactionsView->openView(this->transactions);
+    else
+        transactionsView->openView();
+    currentView = ViewNames::TRANSACTIONS;
+}
+
+void EconomyViewer::openNewTransactionsView(bool loadFileDialog){
+    if(newTransactionsView->openView(accounts, loadFileDialog)){
         closeCurrentView();
-        updateTransactionsTable();
-        transactionsView->show();
-        currentView = ViewNames::TRANSACTIONS;
-        break;
-    case ViewNames::NEW_TRANSACTIONS:
-        if(newTransactionsView->loadTransactions()){
-            closeCurrentView();
-            newTransactionsView->show();
-            currentView = ViewNames::NEW_TRANSACTIONS;
-        }
-        break;
-    case ViewNames::MANAGE_ACCOUNTS:
-        break;
-    case ViewNames::TRANSACTIONS_GROUPS:
-        break;
-    case ViewNames::EDIT_TRANSACTION_GROUP:
-        break;
-    case ViewNames::CHANGE_TRANSACTIONS:
-        break;
-    default:
-        break;
+        currentView = ViewNames::NEW_TRANSACTIONS;
     }
+}
+
+void EconomyViewer::openAccountsView(bool useCoreAccountsVector){
+    closeCurrentView();
+    if(useCoreAccountsVector)
+        accountsView->openView(this->accounts);
+    else
+        accountsView->openView();
+    currentView = ViewNames::MANAGE_ACCOUNTS;
+}
+
+void EconomyViewer::openTransactionGroupsView(){
+    closeCurrentView();
+    transactionGroupsView->openView();
+    currentView = ViewNames::TRANSACTIONS_GROUPS;
 }
 
 void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions){
@@ -86,20 +95,7 @@ void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions
         transactions.push_back(trans);
 }
 
-void EconomyViewer::updateTransactionsTable(){
-    // Populate the table
-    transactionsView->tblTransactions.setRowCount(transactions.size());
-    transactionsView->tblTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT);
-    transactionsView->tblTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
-    int row = 0;
-    for(core::Transaction& transaction: transactions){
-        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::TRANSACTION_DATE, new QTableWidgetItem(transaction.getTransactionDateAsString().c_str()));
-        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::TRANSACTION_AMOUNT, new QTableWidgetItem(transaction.getTransactionAmountAsString().c_str()));
-        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::BALANCE, new QTableWidgetItem(transaction.getBalanceAsString().c_str()));
-        transactionsView->tblTransactions.setItem(row, core::TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
-        row++;
-    }
-    transactionsView->tblTransactions.resizeColumnsToContents();
+void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){
+    accounts = updatedAccounts;
 }
-
 }

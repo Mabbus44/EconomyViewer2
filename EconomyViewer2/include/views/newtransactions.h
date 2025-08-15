@@ -4,8 +4,10 @@
 #include <QFrame>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QComboBox>
 #include "../core/constants.h"
 #include "../core/transaction.h"
+#include "../core/account.h"
 
 namespace views{
 
@@ -17,12 +19,16 @@ public:
     NewTransactions(QWidget* parent);
     QPushButton btnSaveTransactions;
     QTableWidget tblNewTransactions;
-    bool loadTransactions();
+    QComboBox cmbAccounts;
+    bool openView(std::vector<core::Account>& accounts, bool loadFileDialog = true);
+    bool openView(bool loadFileDialog = true);
 private:
     void createViewElements();
     bool checkCellFormat();
+    bool loadTransactions();
+    bool loadAccounts(std::vector<core::Account>& accounts);
 signals:
-    void changedView(core::ViewNames newValue);
+    void openTransactionsView(bool useCoreTransactionVector = false);
     void addNewTransactions(std::vector<core::Transaction>& newValue);
 public slots:
     void btnSaveTransactionsClick(bool checked);

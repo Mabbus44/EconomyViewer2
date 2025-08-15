@@ -26,9 +26,12 @@ void NewTransactions::createViewElements(){
     tblNewTransactions.setFixedHeight(300);
     tblNewTransactions.setFixedWidth(500);
     tblNewTransactions.show();
+    cmbAccounts.setParent(this);
+    cmbAccounts.show();
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(&tblNewTransactions);
+    layout->addWidget(&cmbAccounts);
     layout->addWidget(&btnSaveTransactions);
     this->setLayout(layout);
 
@@ -36,10 +39,30 @@ void NewTransactions::createViewElements(){
     QObject::connect(&btnSaveTransactions, &QPushButton::clicked, this, &NewTransactions::btnSaveTransactionsClick);
 }
 
+bool NewTransactions::openView(std::vector<core::Account>& accounts, bool loadFileDialog){
+    bool ret = true;
+    if(loadFileDialog)
+        ret = loadTransactions();
+    if(ret){
+        loadAccounts(accounts);
+        this->show();
+    }
+    return ret;
+}
+
+bool NewTransactions::openView(bool loadFileDialog){
+    bool ret = true;
+    if(loadFileDialog)
+        ret = loadTransactions();
+    if(ret)
+        this->show();
+    return ret;
+}
+
 bool NewTransactions::checkCellFormat(){
     int rowCount = tblNewTransactions.rowCount();
     int columnCount = tblNewTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT){
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
@@ -74,10 +97,11 @@ bool NewTransactions::checkCellFormat(){
 void NewTransactions::btnSaveTransactionsClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
     if(checkCellFormat()){
+        std::string accountName = cmbAccounts.currentText().toStdString();
         std::vector<core::Transaction> transactions;
         int rowCount = tblNewTransactions.rowCount();
         int columnCount = tblNewTransactions.columnCount();
-        if(columnCount < core::TransactionColumns::COLUMN_COUNT){
+        if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
             core::Utils::showErrorMessage("Transaction table missing columns");
             return;
         }
@@ -92,11 +116,12 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
                 t.setTransactionAmount(core::Utils::toNum(transactionAmount));
                 t.setBalance(core::Utils::toNum(balance));
                 t.setDescription(description);
+                t.setFromAccount(accountName);
                 transactions.push_back(t);
             }
         }
         emit addNewTransactions(transactions);
-        emit changedView(core::ViewNames::TRANSACTIONS);
+        emit openTransactionsView(true);
     }
 }
 
@@ -287,7 +312,7 @@ bool NewTransactions::loadTransactions(){
 
     // Populate the table
     tblNewTransactions.setRowCount(newTransactions.size());
-    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT);
+    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-1);
     tblNewTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
     int row = 0;
     for(core::Transaction& transaction: newTransactions){
@@ -302,4 +327,10 @@ bool NewTransactions::loadTransactions(){
     return true;
 }
 
+bool NewTransactions::loadAccounts(std::vector<core::Account>& accounts){
+    cmbAccounts.clear();
+    for(core::Account account: accounts)
+        cmbAccounts.addItem(account.name().c_str());
+    return true;
+}
 }

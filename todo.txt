@@ -1,8 +1,31 @@
 TODO:
+
+* Redisign, newTransactions added to transaction view instead of core.
+* Add uniqe ID for each transaction, and a method for keeping track of new/changed lines in transactionview and color them differently (green for new, yellow for edited)
+
+* Add transactionsGroups and matchConditions pages (on hold)
+(Fixing btnEditGroupClick, btnSaveChangesClick in transactionGroups.cpp, and EconomyViewer::updateTransactionGroupsTable, tblTransactionGroups need a hidden column with id for each row)
+
+
+* Add match condition to transaction view
+* Review changes
+* Save to file
 * Make transactions table fit columns, but max window width
 * Check that dates is an actual date and not just any numbers in format xxxx-xx-xx
 
 DONE:
+
+v0.02
+* Add accounts page
+* Add accounts to transactions at import
+* Add accounts column to main page
+* Refactor, each view has their own openView method that handles data insead of doing it in core
+* Create open view methods for transactions
+* Create open view methods for newTransaction
+* Create open view methods for accounts
+* Create open view methods for transactionGroups
+
+
 v0.01
 * Load transactions from file
 * Display transactions in "new transactions" view

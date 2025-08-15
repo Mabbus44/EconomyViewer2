@@ -21,7 +21,8 @@ enum TransactionColumns{
     TRANSACTION_AMOUNT = 1,
     BALANCE = 2,
     DESCRIPTION = 3,
-    COLUMN_COUNT = 4,
+    ACCOUNT = 4,
+    COLUMN_COUNT = 5,
 };
 
 class Utils{

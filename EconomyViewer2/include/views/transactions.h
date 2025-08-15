@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include "../core/constants.h"
+#include "../core/transaction.h"
 
 namespace views{
 
@@ -14,15 +15,20 @@ Q_OBJECT
 public:
     Transactions();
     Transactions(QWidget* parent);
+    bool openView();
+    bool openView(std::vector<core::Transaction>& transactions);
     QPushButton btnAddTransactions;
+    QPushButton btnManageAccounts;
     QTableWidget tblTransactions;
 private:
     void createViewElements();
 
 signals:
-    void changedView(core::ViewNames newValue);
+    void openNewTransactionsView(bool openFileDialog = false);
+    void openAccountsView(bool useCoreAccountsVector = false);
 public slots:
     void btnAddTransactionsClick(bool checked);
+    void btnManageAccountsClick(bool checked);
 
 };
 

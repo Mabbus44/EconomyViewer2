@@ -25,6 +25,14 @@ void Transaction::setDescription(std::string description){
     _hasDescription = true;
 }
 
+void Transaction::setFromAccount(std::string accountName){
+    _fromAccount = accountName;
+}
+
+void Transaction::setToAccount(std::string accountName){
+    _toAccount = accountName;
+}
+
 std::string Transaction::getTransactionDateAsString(){
     if(_hasTransactionDate){
         int year = _transactionDate.tm_year + 1900;
@@ -54,6 +62,13 @@ std::string Transaction::getDescriptionAsString(){
     return "";
 }
 
+std::string Transaction::getFromAccountAsString(){
+    return _fromAccount;
+}
+
+std::string Transaction::getToAccountAsString(){
+    return _toAccount;
+}
 
 }
 
