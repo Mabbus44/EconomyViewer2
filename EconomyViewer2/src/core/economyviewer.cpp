@@ -11,20 +11,14 @@ int EconomyViewer::run(int argc, char **argv) {
     window.reset(new QFrame());
     window->show();
 
-    transactionsView.reset(new views::Transactions(window.get()));
-    QObject::connect(transactionsView.get(), &views::Transactions::openNewTransactionsView, this, &EconomyViewer::openNewTransactionsView);
-    QObject::connect(transactionsView.get(), &views::Transactions::openAccountsView, this, &EconomyViewer::openAccountsView);
+    transactionsView.reset(new views::Transactions(window.get(), this));
     transactionsView->openView();
     currentView = ViewNames::TRANSACTIONS;
 
-    newTransactionsView.reset(new views::NewTransactions(window.get()));
-    QObject::connect(newTransactionsView.get(), &views::NewTransactions::openTransactionsView, this, &EconomyViewer::openTransactionsView);
-    QObject::connect(newTransactionsView.get(), &views::NewTransactions::addNewTransactions, this, &EconomyViewer::addNewTransactions);
+    newTransactionsView.reset(new views::NewTransactions(window.get(), this));
     newTransactionsView->hide();
 
-    accountsView.reset(new views::Accounts(window.get()));
-    QObject::connect(accountsView.get(), &views::Accounts::openTransactionsView, this, &EconomyViewer::openTransactionsView);
-    QObject::connect(accountsView.get(), &views::Accounts::updateAccounts, this, &EconomyViewer::updateAccounts);
+    accountsView.reset(new views::Accounts(window.get(), this));
     accountsView->hide();
 
     return app.exec();
@@ -55,21 +49,21 @@ void EconomyViewer::closeCurrentView(){
 
 void EconomyViewer::openTransactionsViewAndAddTransactions(std::vector<Transaction>& transactions){
     closeCurrentView();
-    transactionsView->openView(transactions);
+    transactionsView->openView(transactions, true);
     currentView = ViewNames::TRANSACTIONS;
 }
 
 void EconomyViewer::openTransactionsView(bool useCoreTransactionVector){
     closeCurrentView();
     if(useCoreTransactionVector)
-        transactionsView->openView(this->transactions);
+        transactionsView->openView(this->_transactions);
     else
         transactionsView->openView();
     currentView = ViewNames::TRANSACTIONS;
 }
 
 void EconomyViewer::openNewTransactionsView(bool loadFileDialog){
-    if(newTransactionsView->openView(accounts, loadFileDialog)){
+    if(newTransactionsView->openView(_accounts, loadFileDialog)){
         closeCurrentView();
         currentView = ViewNames::NEW_TRANSACTIONS;
     }
@@ -78,7 +72,7 @@ void EconomyViewer::openNewTransactionsView(bool loadFileDialog){
 void EconomyViewer::openAccountsView(bool useCoreAccountsVector){
     closeCurrentView();
     if(useCoreAccountsVector)
-        accountsView->openView(this->accounts);
+        accountsView->openView(this->_accounts);
     else
         accountsView->openView();
     currentView = ViewNames::MANAGE_ACCOUNTS;
@@ -92,10 +86,19 @@ void EconomyViewer::openTransactionGroupsView(){
 
 void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions){
     for(Transaction& trans: newTransactions)
-        transactions.push_back(trans);
+        _transactions.push_back(trans);
 }
 
 void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){
-    accounts = updatedAccounts;
+    _accounts = updatedAccounts;
+}
+
+void EconomyViewer::updateTransactions(std::vector<Transaction>& updatedTransactions){
+    _transactions = updatedTransactions;
+    core::Utils::showErrorMessage("Update core transactions, new size: " + std::to_string(_transactions.size()));
+}
+
+unsigned int EconomyViewer::getUniqueId(){
+    return _transactionId++;
 }
 }

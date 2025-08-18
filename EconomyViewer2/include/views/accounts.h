@@ -7,6 +7,10 @@
 #include "../core/constants.h"
 #include "../core/account.h"
 
+namespace core{
+class EconomyViewer;
+}
+
 namespace views{
 
 class Accounts: public QFrame
@@ -14,7 +18,7 @@ class Accounts: public QFrame
     Q_OBJECT
 public:
     Accounts();
-    Accounts(QWidget* parent);
+    Accounts(QWidget* parent, core::EconomyViewer* core);
     void populateTable();
     QPushButton btnAddNewAccount;
     QPushButton btnDeleteAccount;
@@ -25,10 +29,8 @@ public:
 private:
     bool checkCellFormat();
     void createViewElements();
+    core::EconomyViewer* _core=nullptr;
 
-signals:
-    void openTransactionsView(bool useCoreTransactionVector = false);
-    void updateAccounts(std::vector<core::Account>& newValue);
 public slots:
     void btnAddNewAccountClick(bool checked);
     void btnDeleteAccountClick(bool checked);

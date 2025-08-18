@@ -1,3 +1,4 @@
+#include "../../include/core/economyviewer.h"
 #include "../../include/views/newtransactions.h"
 #include "../../include/core/transaction.h"
 #include "../../include/core/importedrow.h"
@@ -12,7 +13,8 @@ NewTransactions::NewTransactions() {
     createViewElements();
 }
 
-NewTransactions::NewTransactions(QWidget* parent):QFrame(parent){
+NewTransactions::NewTransactions(QWidget* parent, core::EconomyViewer* core):QFrame(parent){
+    _core = core;
     createViewElements();
 }
 
@@ -62,7 +64,7 @@ bool NewTransactions::openView(bool loadFileDialog){
 bool NewTransactions::checkCellFormat(){
     int rowCount = tblNewTransactions.rowCount();
     int columnCount = tblNewTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
@@ -101,7 +103,7 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
         std::vector<core::Transaction> transactions;
         int rowCount = tblNewTransactions.rowCount();
         int columnCount = tblNewTransactions.columnCount();
-        if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
+        if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
             core::Utils::showErrorMessage("Transaction table missing columns");
             return;
         }
@@ -117,11 +119,11 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
                 t.setBalance(core::Utils::toNum(balance));
                 t.setDescription(description);
                 t.setFromAccount(accountName);
+                t.setId(_core->getUniqueId());
                 transactions.push_back(t);
             }
         }
-        emit addNewTransactions(transactions);
-        emit openTransactionsView(true);
+        _core->openTransactionsViewAndAddTransactions(transactions);
     }
 }
 
@@ -312,7 +314,7 @@ bool NewTransactions::loadTransactions(){
 
     // Populate the table
     tblNewTransactions.setRowCount(newTransactions.size());
-    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-1);
+    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-2);
     tblNewTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
     int row = 0;
     for(core::Transaction& transaction: newTransactions){

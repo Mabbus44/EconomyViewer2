@@ -1,3 +1,4 @@
+#include "../../include/core/economyviewer.h"
 #include "../../include/views/accounts.h"
 #include <QFileDialog>
 #include <QSizePolicy>
@@ -9,7 +10,8 @@ Accounts::Accounts() {
     createViewElements();
 }
 
-Accounts::Accounts(QWidget* parent):QFrame(parent){
+Accounts::Accounts(QWidget* parent, core::EconomyViewer* core):QFrame(parent){
+    _core = core;
     createViewElements();
 }
 
@@ -100,8 +102,8 @@ void Accounts::btnSaveChangesClick(bool checked){
             account.accountNumber(accountNumber);
             accounts.push_back(account);
         }
-        emit updateAccounts(accounts);
-        emit openTransactionsView(true);
+        _core->updateAccounts(accounts);
+        _core->openTransactionsView(true);
     }
 }
 

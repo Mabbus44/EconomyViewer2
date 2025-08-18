@@ -1,19 +1,25 @@
 TODO:
 
-* Redisign, newTransactions added to transaction view instead of core.
-* Add uniqe ID for each transaction, and a method for keeping track of new/changed lines in transactionview and color them differently (green for new, yellow for edited)
+* Make core transaction vector into dict
+* Add a method for keeping track of new/changed lines in transactionview and color them differently (green for new, yellow for edited). Use transaction id
+* Checkbox to only show pending changes
 
 * Add transactionsGroups and matchConditions pages (on hold)
 (Fixing btnEditGroupClick, btnSaveChangesClick in transactionGroups.cpp, and EconomyViewer::updateTransactionGroupsTable, tblTransactionGroups need a hidden column with id for each row)
 
 
 * Add match condition to transaction view
-* Review changes
 * Save to file
 * Make transactions table fit columns, but max window width
 * Check that dates is an actual date and not just any numbers in format xxxx-xx-xx
 
 DONE:
+
+v0.03
+* Redesign, make views have a ref to core, instead of using qt method "connect"
+* Redesign, newTransactions added to transaction view instead of core.
+* Add uniqe ID for each transaction
+* Apply changes button
 
 v0.02
 * Add accounts page

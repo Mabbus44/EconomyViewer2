@@ -11,6 +11,13 @@
 #include "../views/accounts.h"
 #include "../views/transactionGroups.h"
 
+namespace views{
+class Transactions;
+class NewTransactions;
+class Accounts;
+class TransactionGroups;
+}
+
 namespace core{
 
 class EconomyViewer: public QObject
@@ -22,17 +29,11 @@ public:
     void closeCurrentView();
 
     ViewNames currentView = ViewNames::NONE;
-    std::vector<Account> accounts;
-    std::vector<Transaction> transactions;
     QScopedPointer<views::Transactions> transactionsView;
     QScopedPointer<views::NewTransactions> newTransactionsView;
     QScopedPointer<views::Accounts> accountsView;
     QScopedPointer<views::TransactionGroups> transactionGroupsView;
     QScopedPointer<QFrame> window;
-    void updateAccountsTable();
-    void updateTransactionGroupsTable();
-
-public slots:
     void openTransactionsViewAndAddTransactions(std::vector<Transaction>& transactions);
     void openTransactionsView(bool useCoreTransactionVector = false);
     void openNewTransactionsView(bool loadFileDialog = false);
@@ -40,6 +41,12 @@ public slots:
     void openTransactionGroupsView();
     void addNewTransactions(std::vector<Transaction>& newTransactions);
     void updateAccounts(std::vector<Account>& updatedAccounts);
+    void updateTransactions(std::vector<Transaction>& updatedTransactions);
+    unsigned int getUniqueId();
+private:
+    std::vector<Account> _accounts;
+    std::vector<Transaction> _transactions;
+    unsigned int _transactionId=0;
 };
 
 }

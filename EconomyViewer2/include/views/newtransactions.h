@@ -9,6 +9,10 @@
 #include "../core/transaction.h"
 #include "../core/account.h"
 
+namespace core{
+class EconomyViewer;
+}
+
 namespace views{
 
 class NewTransactions: public QFrame
@@ -16,7 +20,7 @@ class NewTransactions: public QFrame
 Q_OBJECT
 public:
     NewTransactions();
-    NewTransactions(QWidget* parent);
+    NewTransactions(QWidget* parent, core::EconomyViewer* core);
     QPushButton btnSaveTransactions;
     QTableWidget tblNewTransactions;
     QComboBox cmbAccounts;
@@ -27,9 +31,7 @@ private:
     bool checkCellFormat();
     bool loadTransactions();
     bool loadAccounts(std::vector<core::Account>& accounts);
-signals:
-    void openTransactionsView(bool useCoreTransactionVector = false);
-    void addNewTransactions(std::vector<core::Transaction>& newValue);
+    core::EconomyViewer* _core=nullptr;
 public slots:
     void btnSaveTransactionsClick(bool checked);
 };

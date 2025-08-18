@@ -33,6 +33,10 @@ void Transaction::setToAccount(std::string accountName){
     _toAccount = accountName;
 }
 
+void Transaction::setId(unsigned int id){
+    _id = id;
+}
+
 std::string Transaction::getTransactionDateAsString(){
     if(_hasTransactionDate){
         int year = _transactionDate.tm_year + 1900;
@@ -70,5 +74,8 @@ std::string Transaction::getToAccountAsString(){
     return _toAccount;
 }
 
+std::string Transaction::getIdAsString(){
+    return std::to_string(_id);
+}
 }
 

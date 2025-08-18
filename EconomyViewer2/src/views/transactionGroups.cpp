@@ -1,3 +1,4 @@
+#include "../../include/core/economyviewer.h"
 #include "../../include/views/transactionGroups.h"
 #include <QSizePolicy>
 #include <QtWidgets>
@@ -8,7 +9,8 @@ TransactionGroups::TransactionGroups() {
     createViewElements();
 }
 
-TransactionGroups::TransactionGroups(QWidget* parent):QFrame(parent){
+TransactionGroups::TransactionGroups(QWidget* parent, core::EconomyViewer* core):QFrame(parent){
+    _core = core;
     createViewElements();
 }
 

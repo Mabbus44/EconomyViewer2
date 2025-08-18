@@ -7,6 +7,10 @@
 #include "../core/constants.h"
 #include "../core/transaction.h"
 
+namespace core{
+class EconomyViewer;
+}
+
 namespace views{
 
 class Transactions: public QFrame
@@ -14,21 +18,23 @@ class Transactions: public QFrame
 Q_OBJECT
 public:
     Transactions();
-    Transactions(QWidget* parent);
+    Transactions(QWidget* parent, core::EconomyViewer* core);
     bool openView();
-    bool openView(std::vector<core::Transaction>& transactions);
+    bool openView(std::vector<core::Transaction>& transactions, bool appendTransactions = false);
     QPushButton btnAddTransactions;
     QPushButton btnManageAccounts;
+    QPushButton btnApplyChanges;
     QTableWidget tblTransactions;
 private:
     void createViewElements();
+    bool checkCellFormat();
+    bool saveTransactionsToCore();
+    core::EconomyViewer* _core=nullptr;
 
-signals:
-    void openNewTransactionsView(bool openFileDialog = false);
-    void openAccountsView(bool useCoreAccountsVector = false);
 public slots:
     void btnAddTransactionsClick(bool checked);
     void btnManageAccountsClick(bool checked);
+    void btnApplyChangesClick(bool checked);
 
 };
 

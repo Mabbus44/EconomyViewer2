@@ -6,6 +6,10 @@
 #include <QTableWidget>
 #include "../core/constants.h"
 
+namespace core{
+class EconomyViewer;
+}
+
 namespace views{
 
 class TransactionGroups: public QFrame
@@ -13,7 +17,7 @@ class TransactionGroups: public QFrame
     Q_OBJECT
 public:
     TransactionGroups();
-    TransactionGroups(QWidget* parent);
+    TransactionGroups(QWidget* parent, core::EconomyViewer* core);
     void populateTable();
     bool openView();
     QPushButton btnAddNewGroup;
@@ -24,10 +28,8 @@ public:
 private:
     bool checkCellFormat();
     void createViewElements();
+    core::EconomyViewer* _core=nullptr;
 
-signals:
-    void changedView(core::ViewNames newValue);
-    void selectTransactionGroup(int id);
 public slots:
     void btnAddNewGroupClick(bool checked);
     void btnDeleteGroupClick(bool checked);
