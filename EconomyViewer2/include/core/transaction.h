@@ -10,6 +10,7 @@ class Transaction
 {
 public:
     Transaction();
+    bool operator==(const Transaction& other) const;
     void setTransactionDate(std::tm date);
     void setBalance(int balance);
     void setTransactionAmount(int transactionAmount);
@@ -24,6 +25,7 @@ public:
     std::string getFromAccountAsString();
     std::string getToAccountAsString();
     std::string getIdAsString();
+    unsigned int getId();
 private:
     std::tm _transactionDate;
     int _balance;   // Balance after transaction

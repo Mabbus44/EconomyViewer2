@@ -1,9 +1,40 @@
 #include "../../include/core/transaction.h"
+#include "../../include/core/constants.h"
 #include <format>
 
 namespace core{
 
 Transaction::Transaction() {}
+
+bool Transaction::operator==(const Transaction& other) const{
+    if(this->_hasTransactionDate != other._hasTransactionDate)
+        return false;
+    if(this->_hasTransactionDate && Utils::compareDates(this->_transactionDate, other._transactionDate) != DateComp::SAME_TIME)
+        return false;
+
+    if(this->_hasBalance != other._hasBalance)
+        return false;
+    if(this->_hasBalance && this->_balance != other._balance)
+        return false;
+
+    if(this->_hasTransactionAmount != other._hasTransactionAmount)
+        return false;
+    if(this->_hasTransactionAmount && this->_transactionAmount != other._transactionAmount)
+        return false;
+
+    if(this->_hasDescription != other._hasDescription)
+        return false;
+    if(this->_hasDescription && this->_description != other._description)
+        return false;
+
+    if(this->_id != other._id)
+        return false;
+    if(this->_fromAccount != other._fromAccount)
+        return false;
+    if(this->_toAccount != other._toAccount)
+        return false;
+    return true;
+}
 
 void Transaction::setTransactionDate(std::tm date){
     _transactionDate = date;
@@ -76,6 +107,10 @@ std::string Transaction::getToAccountAsString(){
 
 std::string Transaction::getIdAsString(){
     return std::to_string(_id);
+}
+
+unsigned int Transaction::getId(){
+    return _id;
 }
 }
 

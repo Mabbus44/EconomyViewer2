@@ -56,7 +56,7 @@ void EconomyViewer::openTransactionsViewAndAddTransactions(std::vector<Transacti
 void EconomyViewer::openTransactionsView(bool useCoreTransactionVector){
     closeCurrentView();
     if(useCoreTransactionVector)
-        transactionsView->openView(this->_transactions);
+        transactionsView->openView(_transactions);
     else
         transactionsView->openView();
     currentView = ViewNames::TRANSACTIONS;
@@ -85,8 +85,10 @@ void EconomyViewer::openTransactionGroupsView(){
 }
 
 void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions){
-    for(Transaction& trans: newTransactions)
-        _transactions.push_back(trans);
+    for(Transaction& transaction: newTransactions){
+        unsigned int id = transaction.getId();
+        _transactions[id] = transaction;
+    }
 }
 
 void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){
@@ -94,11 +96,27 @@ void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){
 }
 
 void EconomyViewer::updateTransactions(std::vector<Transaction>& updatedTransactions){
-    _transactions = updatedTransactions;
+    _transactions.clear();
+    for(Transaction& transaction: updatedTransactions){
+        unsigned int id = transaction.getId();
+        _transactions[id] = transaction;
+    }
     core::Utils::showErrorMessage("Update core transactions, new size: " + std::to_string(_transactions.size()));
 }
 
 unsigned int EconomyViewer::getUniqueId(){
     return _transactionId++;
 }
+
+TransactionState EconomyViewer::getTransactionState(core::Transaction& transaction){
+    unsigned int id = transaction.getId();
+    if(_transactions.count(id)){
+        if(_transactions[id] == transaction)
+            return TransactionState::UNCHANGED;
+        else
+            return TransactionState::CHANGED;
+    }
+    return TransactionState::NEW;
+}
+
 }

@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QFrame>
+#include <map>
 #include "../core/account.h"
 #include "../core/constants.h"
 #include "../core/transaction.h"
@@ -43,9 +44,10 @@ public:
     void updateAccounts(std::vector<Account>& updatedAccounts);
     void updateTransactions(std::vector<Transaction>& updatedTransactions);
     unsigned int getUniqueId();
+    TransactionState getTransactionState(core::Transaction& transaction);
 private:
     std::vector<Account> _accounts;
-    std::vector<Transaction> _transactions;
+    std::map<unsigned int, Transaction> _transactions;
     unsigned int _transactionId=0;
 };
 

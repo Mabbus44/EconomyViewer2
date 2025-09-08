@@ -168,4 +168,36 @@ std::vector<std::tuple<int, int>> Utils::sortKeysByVal(std::map<int, int>& input
     return ret;
 }
 
+DateComp Utils::compareDates(std::tm dateA, std::tm dateB){
+    if(dateA.tm_year > dateB.tm_year)
+        return DateComp::LATER;
+    if(dateA.tm_year < dateB.tm_year)
+        return DateComp::EARLIER;
+
+    if(dateA.tm_mon > dateB.tm_mon)
+        return DateComp::LATER;
+    if(dateA.tm_mon < dateB.tm_mon)
+        return DateComp::EARLIER;
+
+    if(dateA.tm_mday > dateB.tm_mday)
+        return DateComp::LATER;
+    if(dateA.tm_mday < dateB.tm_mday)
+        return DateComp::EARLIER;
+
+    if(dateA.tm_hour > dateB.tm_hour)
+        return DateComp::LATER;
+    if(dateA.tm_hour < dateB.tm_hour)
+        return DateComp::EARLIER;
+
+    if(dateA.tm_min > dateB.tm_min)
+        return DateComp::LATER;
+    if(dateA.tm_min < dateB.tm_min)
+        return DateComp::EARLIER;
+
+    if(dateA.tm_sec > dateB.tm_sec)
+        return DateComp::LATER;
+    if(dateA.tm_sec < dateB.tm_sec)
+        return DateComp::EARLIER;
+    return DateComp::SAME_TIME;
+}
 }

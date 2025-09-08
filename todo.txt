@@ -1,12 +1,9 @@
 TODO:
-
-* Make core transaction vector into dict
-* Add a method for keeping track of new/changed lines in transactionview and color them differently (green for new, yellow for edited). Use transaction id
+* Color edited transactions yellow  (Transactions::tblTransactionsChanged Made a function to compare transaction with core and return if they changed, this should be compared with color and if color is wrong it should change)
 * Checkbox to only show pending changes
 
 * Add transactionsGroups and matchConditions pages (on hold)
 (Fixing btnEditGroupClick, btnSaveChangesClick in transactionGroups.cpp, and EconomyViewer::updateTransactionGroupsTable, tblTransactionGroups need a hidden column with id for each row)
-
 
 * Add match condition to transaction view
 * Save to file
@@ -14,6 +11,8 @@ TODO:
 * Check that dates is an actual date and not just any numbers in format xxxx-xx-xx
 
 DONE:
+* Make core transaction vector into dict
+* Color newly added (unapplied) transactions green
 
 v0.03
 * Redesign, make views have a ref to core, instead of using qt method "connect"

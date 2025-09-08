@@ -3,6 +3,7 @@
 #include "../../include/core/constants.h"
 #include <QMessageBox>
 #include <QSizePolicy>
+#include <QColor>
 #include <QtWidgets>
 
 namespace views{
@@ -19,6 +20,14 @@ Transactions::Transactions(QWidget* parent, core::EconomyViewer* core):QFrame(pa
 bool Transactions::openView(){
     this->show();
     return true;
+}
+
+bool Transactions::openView(std::map<unsigned int, core::Transaction>& transactions, bool appendTransactions){
+    std::vector<core::Transaction> transVector;
+    for(auto const& p: transactions){
+        transVector.push_back(p.second);
+    }
+    return openView(transVector, appendTransactions);
 }
 
 bool Transactions::openView(std::vector<core::Transaction>& transactions, bool appendTransactions){
@@ -39,6 +48,8 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
         tblTransactions.setItem(row, core::TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
         tblTransactions.setItem(row, core::TransactionColumns::ACCOUNT, new QTableWidgetItem(transaction.getFromAccountAsString().c_str()));
         tblTransactions.setItem(row, core::TransactionColumns::ID, new QTableWidgetItem(transaction.getIdAsString().c_str()));
+        for(int col=0; col<core::TransactionColumns::COLUMN_COUNT; col++)
+            tblTransactions.item(row, col)->setBackground(Qt::green);
         row++;
     }
     tblTransactions.resizeColumnsToContents();
@@ -96,24 +107,29 @@ bool Transactions::saveTransactionsToCore(){
         return false;
     }
     std::vector<core::Transaction> transactions;
-    for(int row=0; row < rowCount; row++){
-        std::string date = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
-        std::string transactionAmount = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
-        std::string balance = tblTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
-        std::string description = tblTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
-        std::string accountName = tblTransactions.item(row, core::TransactionColumns::ACCOUNT)->text().toStdString();
-        std::string id = tblTransactions.item(row, core::TransactionColumns::ID)->text().toStdString();
-        core::Transaction t;
-        t.setTransactionDate(core::Utils::toDate(date));
-        t.setTransactionAmount(core::Utils::toNum(transactionAmount));
-        t.setBalance(core::Utils::toNum(balance));
-        t.setDescription(description);
-        t.setFromAccount(accountName);
-        t.setId(core::Utils::toNum(id));
-        transactions.push_back(t);
-    }
+    for(int row=0; row < rowCount; row++)
+        transactions.push_back(rowToTransaction(row));
     _core->updateTransactions(transactions);
     return true;
+}
+
+core::Transaction Transactions::rowToTransaction(int row){
+    std::string date = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
+    auto a = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT);
+    auto b = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text();
+    std::string transactionAmount = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
+    std::string balance = tblTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
+    std::string description = tblTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
+    std::string accountName = tblTransactions.item(row, core::TransactionColumns::ACCOUNT)->text().toStdString();
+    std::string id = tblTransactions.item(row, core::TransactionColumns::ID)->text().toStdString();
+    core::Transaction t;
+    t.setTransactionDate(core::Utils::toDate(date));
+    t.setTransactionAmount(core::Utils::toNum(transactionAmount));
+    t.setBalance(core::Utils::toNum(balance));
+    t.setDescription(description);
+    t.setFromAccount(accountName);
+    t.setId(core::Utils::toNum(id));
+    return t;
 }
 
 void Transactions::createViewElements(){
@@ -146,9 +162,28 @@ void Transactions::createViewElements(){
     this->setLayout(layout);
 
     this->show();
+    QObject::connect(&tblTransactions, &QTableWidget::cellChanged, this, &Transactions::tblTransactionsChanged);
     QObject::connect(&btnAddTransactions, &QPushButton::clicked, this, &Transactions::btnAddTransactionsClick);
     QObject::connect(&btnManageAccounts, &QPushButton::clicked, this, &Transactions::btnManageAccountsClick);
     QObject::connect(&btnApplyChanges, &QPushButton::clicked, this, &Transactions::btnApplyChangesClick);
+}
+
+void Transactions::tblTransactionsChanged(int row, int col){
+    QBrush brush = tblTransactions.item(row, col)->background();
+    core::Transaction transaction = rowToTransaction(row);
+    core::TransactionState state = _core->getTransactionState(transaction);
+    if(state == core::TransactionState::NEW && brush.color() != Qt::green){
+        core::Utils::showErrorMessage("Change to green");
+        //tblTransactions.item(row, col)->setBackground(Qt::green);
+    }
+    if(state == core::TransactionState::CHANGED && brush.color() != Qt::yellow){
+        core::Utils::showErrorMessage("Change to yellow");
+        //tblTransactions.item(row, col)->setBackground(Qt::yellow);
+    }
+    if(state == core::TransactionState::NEW && brush.color() != Qt::transparent){
+        core::Utils::showErrorMessage("Change to transparent");
+        //tblTransactions.item(row, col)->setBackground(Qt::transparent);
+    }
 }
 
 void Transactions::btnAddTransactionsClick(bool checked){

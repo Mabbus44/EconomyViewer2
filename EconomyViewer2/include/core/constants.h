@@ -26,6 +26,18 @@ enum TransactionColumns{
     COLUMN_COUNT = 6,
 };
 
+enum TransactionState{
+    UNCHANGED = 0,
+    CHANGED = 1,
+    NEW = 2
+};
+
+enum DateComp{
+    EARLIER = 0,
+    SAME_TIME = 1,
+    LATER = 2
+};
+
 class Utils{
 public:
     Utils(){};
@@ -37,6 +49,7 @@ public:
     static std::tm toDate(std::string str);
     static double toNum(std::string str);
     static std::vector<std::tuple<int, int>> sortKeysByVal(std::map<int, int>& inputMap);
+    static DateComp compareDates(std::tm dateA, std::tm dateB);
 };
 
 
