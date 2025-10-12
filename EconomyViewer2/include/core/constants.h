@@ -23,13 +23,15 @@ enum TransactionColumns{
     DESCRIPTION = 3,
     ACCOUNT = 4,
     ID = 5,
-    COLUMN_COUNT = 6,
+    STATUS = 6,
+    COLUMN_COUNT = 7,
 };
 
 enum TransactionState{
     UNCHANGED = 0,
     CHANGED = 1,
-    NEW = 2
+    NEW = 2,
+    ERROR = 3
 };
 
 enum DateComp{
@@ -48,6 +50,7 @@ public:
     static bool isNum(std::string str);
     static std::tm toDate(std::string str);
     static double toNum(std::string str);
+    static int toInt(std::string str);
     static std::vector<std::tuple<int, int>> sortKeysByVal(std::map<int, int>& inputMap);
     static DateComp compareDates(std::tm dateA, std::tm dateB);
 };

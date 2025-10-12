@@ -48,7 +48,7 @@ public:
 private:
     std::vector<Account> _accounts;
     std::map<unsigned int, Transaction> _transactions;
-    unsigned int _transactionId=0;
+    unsigned int _transactionId=1;
 };
 
 }

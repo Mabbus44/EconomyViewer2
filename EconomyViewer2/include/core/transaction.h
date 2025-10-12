@@ -37,7 +37,10 @@ private:
     bool _hasTransactionDate = false;
     bool _hasBalance = false;
     bool _hasTransactionAmount = false;
+    bool _hasId = false;
     bool _hasDescription = false;
+    bool _hasFromAccount = false;
+    bool _hasToAccount = false;
 };
 
 }

@@ -27,7 +27,7 @@ ImportedRow& ImportedRow::operator=(const ImportedRow& other){
 }
 
 void ImportedRow::parseRow(std::string row){
-    _columns = core::Utils::splitString(row, ",");
+    _columns = core::Utils::splitString(row, ";");
     for(int col = 0; col < (int)_columns.size(); col++){
         if(Utils::isDate(_columns[col])){
             _dateColumns.push_back(col);
@@ -72,7 +72,7 @@ int ImportedRow::getColumnAsNum(int columnId){
         core::Utils::showErrorMessage("Error: Tried to access illigal column as num!");
         return 0;
     }
-    return Utils::toNum(_columns[columnId]);
+    return Utils::toInt(_columns[columnId]);
 }
 
 std::string ImportedRow::getColumnAsText(int columnId){

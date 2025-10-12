@@ -64,7 +64,7 @@ bool NewTransactions::openView(bool loadFileDialog){
 bool NewTransactions::checkCellFormat(){
     int rowCount = tblNewTransactions.rowCount();
     int columnCount = tblNewTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-3){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
@@ -103,7 +103,7 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
         std::vector<core::Transaction> transactions;
         int rowCount = tblNewTransactions.rowCount();
         int columnCount = tblNewTransactions.columnCount();
-        if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
+        if(columnCount < core::TransactionColumns::COLUMN_COUNT-3){
             core::Utils::showErrorMessage("Transaction table missing columns");
             return;
         }
@@ -115,8 +115,8 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
             if(core::Utils::isDate(date) && core::Utils::isNum(transactionAmount) && core::Utils::isNum(balance)){
                 core::Transaction t;
                 t.setTransactionDate(core::Utils::toDate(date));
-                t.setTransactionAmount(core::Utils::toNum(transactionAmount));
-                t.setBalance(core::Utils::toNum(balance));
+                t.setTransactionAmount(core::Utils::toInt(transactionAmount));
+                t.setBalance(core::Utils::toInt(balance));
                 t.setDescription(description);
                 t.setFromAccount(accountName);
                 t.setId(_core->getUniqueId());
@@ -155,21 +155,21 @@ bool NewTransactions::loadTransactions(){
                 if (dateColumns.find(column) == dateColumns.end()) {
                     dateColumns[column] = 1;
                 }else{
-                    dateColumns[column] = dateColumns[column]+1;
+                    dateColumns[column]++;
                 }
             }
             for(int column: rowTextColumns){
                 if (textColumns.find(column) == textColumns.end()) {
                     textColumns[column] = 1;
                 }else{
-                    textColumns[column] = textColumns[column]+1;
+                    textColumns[column]++;
                 }
             }
             for(int column: rowNumColumns){
                 if (numColumns.find(column) == numColumns.end()) {
                     numColumns[column] = 1;
                 }else{
-                    numColumns[column] = numColumns[column]+1;
+                    numColumns[column]++;
                 }
             }
         }
@@ -314,7 +314,7 @@ bool NewTransactions::loadTransactions(){
 
     // Populate the table
     tblNewTransactions.setRowCount(newTransactions.size());
-    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-2);
+    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-3);
     tblNewTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
     int row = 0;
     for(core::Transaction& transaction: newTransactions){

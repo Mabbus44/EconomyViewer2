@@ -1,5 +1,5 @@
 TODO:
-* Color edited transactions yellow  (Transactions::tblTransactionsChanged Made a function to compare transaction with core and return if they changed, this should be compared with color and if color is wrong it should change)
+* Update color when transactions are applied
 * Checkbox to only show pending changes
 
 * Add transactionsGroups and matchConditions pages (on hold)
@@ -11,6 +11,7 @@ TODO:
 * Check that dates is an actual date and not just any numbers in format xxxx-xx-xx
 
 DONE:
+* Color edited transactions yellow
 * Make core transaction vector into dict
 * Color newly added (unapplied) transactions green
 

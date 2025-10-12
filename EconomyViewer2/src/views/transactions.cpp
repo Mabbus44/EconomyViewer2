@@ -35,8 +35,9 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
     if(!appendTransactions || tblTransactions.rowCount() <= 0){
         tblTransactions.setRowCount(transactions.size());
         tblTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT);
-        tblTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment","Account", "id"});
+        tblTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment","Account", "Id", "Status"});
         tblTransactions.hideColumn(core::TransactionColumns::ID);
+        tblTransactions.hideColumn(core::TransactionColumns::STATUS);
     }else{
         row = tblTransactions.rowCount();
         tblTransactions.setRowCount(tblTransactions.rowCount() + transactions.size());
@@ -47,9 +48,19 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
         tblTransactions.setItem(row, core::TransactionColumns::BALANCE, new QTableWidgetItem(transaction.getBalanceAsString().c_str()));
         tblTransactions.setItem(row, core::TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
         tblTransactions.setItem(row, core::TransactionColumns::ACCOUNT, new QTableWidgetItem(transaction.getFromAccountAsString().c_str()));
+        for(int col=0; col<core::TransactionColumns::COLUMN_COUNT; col++){
+            if(col != core::TransactionColumns::ID && col != core::TransactionColumns::STATUS)
+                tblTransactions.item(row, col)->setBackground(Qt::green);
+        }
         tblTransactions.setItem(row, core::TransactionColumns::ID, new QTableWidgetItem(transaction.getIdAsString().c_str()));
-        for(int col=0; col<core::TransactionColumns::COLUMN_COUNT; col++)
-            tblTransactions.item(row, col)->setBackground(Qt::green);
+        core::TransactionState state;
+        int errorCol = checkRowFormat(row);
+        if(errorCol == -1)
+            state = _core->getTransactionState(transaction);
+        else
+            state = core::TransactionState::ERROR;
+        std::string itIsANumberRightQutionsmark = std::to_string(state).c_str();
+        tblTransactions.setItem(row, core::TransactionColumns::STATUS, new QTableWidgetItem(std::to_string(state).c_str()));
         row++;
     }
     tblTransactions.resizeColumnsToContents();
@@ -57,52 +68,53 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
     return true;
 }
 
-bool Transactions::checkCellFormat(){
+bool Transactions::checkAllCellsFormat(){
     int rowCount = tblTransactions.rowCount();
     int columnCount = tblTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
     bool ret = true;
     for(int row=0; row < rowCount; row++){
-        std::string date = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
-        std::string transactionAmount = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
-        std::string balance = tblTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
-        std::string description = tblTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
-        std::string id = tblTransactions.item(row, core::TransactionColumns::ID)->text().toStdString();
-        if(core::Utils::isDate(date))
-            tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::white);
-        else{
-            tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::red);
-            ret = false;
-        }
-        if(core::Utils::isNum(transactionAmount))
-            tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::white);
-        else{
-            tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::red);
-            ret = false;
-        }
-        if(core::Utils::isNum(balance))
-            tblTransactions.item(row, core::TransactionColumns::BALANCE)->setBackground(Qt::white);
-        else{
-            tblTransactions.item(row, core::TransactionColumns::BALANCE)->setBackground(Qt::red);
-            ret = false;
-        }
-        if(core::Utils::isNum(id))
-            tblTransactions.item(row, core::TransactionColumns::ID)->setBackground(Qt::white);
-        else{
-            tblTransactions.item(row, core::TransactionColumns::ID)->setBackground(Qt::red);
+        int col = checkRowFormat(row);
+        if(col != -1){
+            tblTransactions.item(row, col)->setBackground(Qt::red);
             ret = false;
         }
     }
     return ret;
 }
 
+void Transactions::updateAllCellsFormat(){
+    int rowCount = tblTransactions.rowCount();
+    int columnCount = tblTransactions.columnCount();
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
+        core::Utils::showErrorMessage("Transaction table missing columns");
+        return;
+    }
+    for(int row=0; row < rowCount; row++){
+        calculateAndSetColorOfRow(row, true);
+    }
+}
+
+int Transactions::checkRowFormat(int row){
+    std::string date = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
+    std::string transactionAmount = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
+    std::string balance = tblTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
+    if(!core::Utils::isDate(date))
+        return core::TransactionColumns::TRANSACTION_DATE;
+    if(!core::Utils::isNum(transactionAmount))
+        return core::TransactionColumns::TRANSACTION_AMOUNT;
+    if(!core::Utils::isNum(balance))
+        return core::TransactionColumns::BALANCE;
+    return -1;
+}
+
 bool Transactions::saveTransactionsToCore(){
     int rowCount = tblTransactions.rowCount();
     int columnCount = tblTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT-1){
+    if(columnCount < core::TransactionColumns::COLUMN_COUNT-2){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
@@ -110,25 +122,29 @@ bool Transactions::saveTransactionsToCore(){
     for(int row=0; row < rowCount; row++)
         transactions.push_back(rowToTransaction(row));
     _core->updateTransactions(transactions);
+    updateAllCellsFormat();
     return true;
 }
 
 core::Transaction Transactions::rowToTransaction(int row){
+    core::Transaction t;
+    QTableWidgetItem* idItemPtr = tblTransactions.item(row, core::TransactionColumns::ID);
+    if(idItemPtr == nullptr)
+        return t;
+    std::string id = tblTransactions.item(row, core::TransactionColumns::ID)->text().toStdString();
+    if(!core::Utils::isNum(id) || id == "0")
+        return t;
     std::string date = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
-    auto a = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT);
-    auto b = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text();
     std::string transactionAmount = tblTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
     std::string balance = tblTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
     std::string description = tblTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
     std::string accountName = tblTransactions.item(row, core::TransactionColumns::ACCOUNT)->text().toStdString();
-    std::string id = tblTransactions.item(row, core::TransactionColumns::ID)->text().toStdString();
-    core::Transaction t;
     t.setTransactionDate(core::Utils::toDate(date));
-    t.setTransactionAmount(core::Utils::toNum(transactionAmount));
-    t.setBalance(core::Utils::toNum(balance));
+    t.setTransactionAmount(core::Utils::toInt(transactionAmount));
+    t.setBalance(core::Utils::toInt(balance));
     t.setDescription(description);
     t.setFromAccount(accountName);
-    t.setId(core::Utils::toNum(id));
+    t.setId(core::Utils::toInt(id));
     return t;
 }
 
@@ -169,21 +185,51 @@ void Transactions::createViewElements(){
 }
 
 void Transactions::tblTransactionsChanged(int row, int col){
-    QBrush brush = tblTransactions.item(row, col)->background();
+    if(col){} // Remove warning
+    calculateAndSetColorOfRow(row);
+}
+
+void Transactions::calculateAndSetColorOfRow(int row, bool alwaysSetColor){
+    // Check that status colum has value (otherwise row is under construction)
+    QTableWidgetItem* statusItemPtr = tblTransactions.item(row, core::TransactionColumns::STATUS);
+    if(statusItemPtr == nullptr)
+        return;
+
+    // Compare status from column with format check of row. If it has turned to error change status column and color invalid column
+    core::TransactionState stateFromTable = static_cast<core::TransactionState>(core::Utils::toInt(statusItemPtr->text().toStdString()));
+    int errorCol = checkRowFormat(row);
+    if(errorCol != -1){
+        if(stateFromTable != core::TransactionState::ERROR){
+            statusItemPtr->setText(std::to_string(core::TransactionState::ERROR).c_str());
+            tblTransactions.item(row, errorCol)->setBackground(Qt::red);
+        } else if(alwaysSetColor)
+            tblTransactions.item(row, errorCol)->setBackground(Qt::red);
+        return;
+    }
+
+    // Convert row to transaction, check its status and if it differs from status column, change color of row
     core::Transaction transaction = rowToTransaction(row);
-    core::TransactionState state = _core->getTransactionState(transaction);
-    if(state == core::TransactionState::NEW && brush.color() != Qt::green){
-        core::Utils::showErrorMessage("Change to green");
-        //tblTransactions.item(row, col)->setBackground(Qt::green);
-    }
-    if(state == core::TransactionState::CHANGED && brush.color() != Qt::yellow){
-        core::Utils::showErrorMessage("Change to yellow");
-        //tblTransactions.item(row, col)->setBackground(Qt::yellow);
-    }
-    if(state == core::TransactionState::NEW && brush.color() != Qt::transparent){
-        core::Utils::showErrorMessage("Change to transparent");
-        //tblTransactions.item(row, col)->setBackground(Qt::transparent);
-    }
+    core::TransactionState stateFromCore = _core->getTransactionState(transaction);
+    if(stateFromTable != stateFromCore){
+        statusItemPtr->setText(std::to_string(stateFromCore).c_str());
+        changeColorOfRow(row, stateFromCore);
+    } else if(alwaysSetColor)
+        changeColorOfRow(row, stateFromCore);
+}
+
+void Transactions::changeColorOfRow(int row, core::TransactionState state){
+    QBrush color = Qt::transparent;
+    if(state == core::TransactionState::UNCHANGED)
+        color = Qt::transparent;
+    else if(state == core::TransactionState::CHANGED)
+        color = Qt::yellow;
+    else if(state == core::TransactionState::NEW)
+        color = Qt::green;
+    else if(state == core::TransactionState::ERROR)
+        color = Qt::red;
+    for(int col=0; col<core::TransactionColumns::COLUMN_COUNT; col++)
+        if(col != core::TransactionColumns::ID && col != core::TransactionColumns::STATUS)
+            tblTransactions.item(row, col)->setBackground(color);
 }
 
 void Transactions::btnAddTransactionsClick(bool checked){
@@ -201,7 +247,7 @@ void Transactions::btnManageAccountsClick(bool checked){
 void Transactions::btnApplyChangesClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
 
-    if(checkCellFormat()){
+    if(checkAllCellsFormat()){
         saveTransactionsToCore();
     }
 }

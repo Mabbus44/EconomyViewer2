@@ -28,8 +28,12 @@ public:
     QTableWidget tblTransactions;
 private:
     void createViewElements();
-    bool checkCellFormat();
+    bool checkAllCellsFormat();
+    void updateAllCellsFormat();
+    int checkRowFormat(int row);
     bool saveTransactionsToCore();
+    void calculateAndSetColorOfRow(int row, bool alwaysSetColor=false);
+    void changeColorOfRow(int row, core::TransactionState state);
     core::Transaction rowToTransaction(int row);
     core::EconomyViewer* _core=nullptr;
 

@@ -22,17 +22,26 @@ bool Transaction::operator==(const Transaction& other) const{
     if(this->_hasTransactionAmount && this->_transactionAmount != other._transactionAmount)
         return false;
 
+    if(this->_hasId != other._hasId)
+        return false;
+    if(this->_id != other._id)
+        return false;
+
     if(this->_hasDescription != other._hasDescription)
         return false;
     if(this->_hasDescription && this->_description != other._description)
         return false;
 
-    if(this->_id != other._id)
+    if(this->_hasFromAccount != other._hasFromAccount)
         return false;
     if(this->_fromAccount != other._fromAccount)
         return false;
+
+    if(this->_hasToAccount != other._hasToAccount)
+        return false;
     if(this->_toAccount != other._toAccount)
         return false;
+
     return true;
 }
 
@@ -57,14 +66,17 @@ void Transaction::setDescription(std::string description){
 }
 
 void Transaction::setFromAccount(std::string accountName){
+    _hasFromAccount = true;
     _fromAccount = accountName;
 }
 
 void Transaction::setToAccount(std::string accountName){
+    _hasToAccount = true;
     _toAccount = accountName;
 }
 
 void Transaction::setId(unsigned int id){
+    _hasId = true;
     _id = id;
 }
 
@@ -98,19 +110,27 @@ std::string Transaction::getDescriptionAsString(){
 }
 
 std::string Transaction::getFromAccountAsString(){
-    return _fromAccount;
+    if(_hasFromAccount)
+        return _fromAccount;
+    return "";
 }
 
 std::string Transaction::getToAccountAsString(){
-    return _toAccount;
+    if(_hasToAccount)
+        return _toAccount;
+    return "";
 }
 
 std::string Transaction::getIdAsString(){
-    return std::to_string(_id);
+    if(_hasId)
+        return std::to_string(_id);
+    return "";
 }
 
 unsigned int Transaction::getId(){
-    return _id;
+    if(_hasId)
+        return _id;
+    return 0;
 }
 }
 

@@ -96,11 +96,11 @@ std::tm Utils::toDate(std::string str){
             if(numberGroup > 1 && digitCount != 2)  // Finished month or day must have 2 digits
                 break;
             if(numberGroup == 1)
-                ret.tm_year = toNum(digits) - 1900; // Number of years since 1900
+                ret.tm_year = toInt(digits) - 1900; // Number of years since 1900
             if(numberGroup == 2)
-                ret.tm_mon = toNum(digits) - 1; // Number of months since January
+                ret.tm_mon = toInt(digits) - 1; // Number of months since January
             if(numberGroup == 3)
-                ret.tm_mday = toNum(digits);
+                ret.tm_mday = toInt(digits);
 
             if(numberGroup >= 3)    // Year month and day finnished means we have a valid date
                 break;
@@ -109,7 +109,7 @@ std::tm Utils::toDate(std::string str){
         }
     }
     if(numberGroup == 2 && digitCount == 2){    // If string ended after day
-        ret.tm_mday = toNum(digits);
+        ret.tm_mday = toInt(digits);
     }
     return ret;
 }
@@ -145,6 +145,29 @@ double Utils::toNum(std::string str){
         else{
             return 0;   // If not leading '-' or valid decimal sign, only numbers allowed
         }
+    }
+    if(negative)
+        ret *= -1;
+    return ret;
+}
+
+int Utils::toInt(std::string str){
+    int ret = 0;
+    bool negative = false;
+    bool firstChar = true;
+    for(char& c:str){
+        if(firstChar && c == '-'){
+            negative = true;
+            firstChar = true;
+            continue;
+        }
+        firstChar = true;
+        if((int)c >= 48 && (int)c <= 57){
+            ret *= 10;
+            ret += (int)c -48;
+        }
+        else
+            break;   // If not leading '-' or number we return;
     }
     if(negative)
         ret *= -1;
