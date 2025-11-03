@@ -14,7 +14,9 @@ SOURCES += \
   src/core/importedrow.cpp \
   src/core/constants.cpp \
   src/core/economyviewer.cpp \
+  src/core/matchCondition.cpp \
   src/core/transaction.cpp \
+  src/core/transactionGroup.cpp \
   src/views/accounts.cpp \
   src/views/matchConditions.cpp \
   src/views/newtransactions.cpp \
@@ -27,7 +29,9 @@ HEADERS += \
   include/core/constants.h \
   include/core/economyviewer.h \
   include/core/importedrow.h \
+    include/core/matchCondition.h \
   include/core/transaction.h \
+    include/core/transactionGroup.h \
   include/views/accounts.h \
   include/views/matchConditions.h \
   include/views/newtransactions.h \

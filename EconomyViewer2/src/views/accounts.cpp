@@ -2,7 +2,7 @@
 #include "../../include/views/accounts.h"
 #include <QFileDialog>
 #include <QSizePolicy>
-#include <QtWidgets>
+#include <QLayout>
 
 namespace views{
 

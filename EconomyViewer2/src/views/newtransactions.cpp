@@ -5,7 +5,7 @@
 #include <fstream>
 #include <QFileDialog>
 #include <QSizePolicy>
-#include <QtWidgets>
+#include <QLayout>
 
 namespace views{
 
@@ -64,32 +64,32 @@ bool NewTransactions::openView(bool loadFileDialog){
 bool NewTransactions::checkCellFormat(){
     int rowCount = tblNewTransactions.rowCount();
     int columnCount = tblNewTransactions.columnCount();
-    if(columnCount < core::TransactionColumns::COLUMN_COUNT-3){
+    if(columnCount < TransactionColumns::COLUMN_COUNT-3){
         core::Utils::showErrorMessage("Transaction table missing columns");
         return false;
     }
     bool ret = true;
     for(int row=0; row < rowCount; row++){
-        std::string date = tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
-        std::string transactionAmount = tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
-        std::string balance = tblNewTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
-        std::string description = tblNewTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
+        std::string date = tblNewTransactions.item(row, TransactionColumns::TRANSACTION_DATE)->text().toStdString();
+        std::string transactionAmount = tblNewTransactions.item(row, TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
+        std::string balance = tblNewTransactions.item(row, TransactionColumns::BALANCE)->text().toStdString();
+        std::string description = tblNewTransactions.item(row, TransactionColumns::DESCRIPTION)->text().toStdString();
         if(core::Utils::isDate(date))
-            tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::white);
+            tblNewTransactions.item(row, TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::white);
         else{
-            tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::red);
+            tblNewTransactions.item(row, TransactionColumns::TRANSACTION_DATE)->setBackground(Qt::red);
             ret = false;
         }
         if(core::Utils::isNum(transactionAmount))
-            tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::white);
+            tblNewTransactions.item(row, TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::white);
         else{
-            tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::red);
+            tblNewTransactions.item(row, TransactionColumns::TRANSACTION_AMOUNT)->setBackground(Qt::red);
             ret = false;
         }
         if(core::Utils::isNum(balance))
-            tblNewTransactions.item(row, core::TransactionColumns::BALANCE)->setBackground(Qt::white);
+            tblNewTransactions.item(row, TransactionColumns::BALANCE)->setBackground(Qt::white);
         else{
-            tblNewTransactions.item(row, core::TransactionColumns::BALANCE)->setBackground(Qt::red);
+            tblNewTransactions.item(row, TransactionColumns::BALANCE)->setBackground(Qt::red);
             ret = false;
         }
     }
@@ -103,15 +103,15 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
         std::vector<core::Transaction> transactions;
         int rowCount = tblNewTransactions.rowCount();
         int columnCount = tblNewTransactions.columnCount();
-        if(columnCount < core::TransactionColumns::COLUMN_COUNT-3){
+        if(columnCount < TransactionColumns::COLUMN_COUNT-3){
             core::Utils::showErrorMessage("Transaction table missing columns");
             return;
         }
         for(int row=0; row < rowCount; row++){
-            std::string date = tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_DATE)->text().toStdString();
-            std::string transactionAmount = tblNewTransactions.item(row, core::TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
-            std::string balance = tblNewTransactions.item(row, core::TransactionColumns::BALANCE)->text().toStdString();
-            std::string description = tblNewTransactions.item(row, core::TransactionColumns::DESCRIPTION)->text().toStdString();
+            std::string date = tblNewTransactions.item(row, TransactionColumns::TRANSACTION_DATE)->text().toStdString();
+            std::string transactionAmount = tblNewTransactions.item(row, TransactionColumns::TRANSACTION_AMOUNT)->text().toStdString();
+            std::string balance = tblNewTransactions.item(row, TransactionColumns::BALANCE)->text().toStdString();
+            std::string description = tblNewTransactions.item(row, TransactionColumns::DESCRIPTION)->text().toStdString();
             if(core::Utils::isDate(date) && core::Utils::isNum(transactionAmount) && core::Utils::isNum(balance)){
                 core::Transaction t;
                 t.setTransactionDate(core::Utils::toDate(date));
@@ -119,7 +119,7 @@ void NewTransactions::btnSaveTransactionsClick(bool checked){
                 t.setBalance(core::Utils::toInt(balance));
                 t.setDescription(description);
                 t.setFromAccount(accountName);
-                t.setId(_core->getUniqueId());
+                t.setId(_core->getUniqueTransactionId());
                 transactions.push_back(t);
             }
         }
@@ -314,14 +314,14 @@ bool NewTransactions::loadTransactions(){
 
     // Populate the table
     tblNewTransactions.setRowCount(newTransactions.size());
-    tblNewTransactions.setColumnCount(core::TransactionColumns::COLUMN_COUNT-3);
+    tblNewTransactions.setColumnCount(TransactionColumns::COLUMN_COUNT-3);
     tblNewTransactions.setHorizontalHeaderLabels({"Date","Transfer amount","Balance","Comment"});
     int row = 0;
     for(core::Transaction& transaction: newTransactions){
-        tblNewTransactions.setItem(row, core::TransactionColumns::TRANSACTION_DATE, new QTableWidgetItem(transaction.getTransactionDateAsString().c_str()));
-        tblNewTransactions.setItem(row, core::TransactionColumns::TRANSACTION_AMOUNT, new QTableWidgetItem(transaction.getTransactionAmountAsString().c_str()));
-        tblNewTransactions.setItem(row, core::TransactionColumns::BALANCE, new QTableWidgetItem(transaction.getBalanceAsString().c_str()));
-        tblNewTransactions.setItem(row, core::TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
+        tblNewTransactions.setItem(row, TransactionColumns::TRANSACTION_DATE, new QTableWidgetItem(transaction.getTransactionDateAsString().c_str()));
+        tblNewTransactions.setItem(row, TransactionColumns::TRANSACTION_AMOUNT, new QTableWidgetItem(transaction.getTransactionAmountAsString().c_str()));
+        tblNewTransactions.setItem(row, TransactionColumns::BALANCE, new QTableWidgetItem(transaction.getBalanceAsString().c_str()));
+        tblNewTransactions.setItem(row, TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.getDescriptionAsString().c_str()));
         row++;
     }
     tblNewTransactions.resizeColumnsToContents();

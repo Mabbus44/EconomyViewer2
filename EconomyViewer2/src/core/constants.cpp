@@ -1,5 +1,26 @@
 #include "../../include/core/constants.h"
 
+namespace CompareTypeStr{
+    const char* CONTAINS = "Contains";
+    const char* STARTS_WITH = "Starts with";
+    const char* ENDS_WITH = "Ends with";
+    const char* GRATER_THAN = ">";
+    const char* LESS_THAN = "<";
+    const char* GRATER_OR_EQUAL_TO = ">=";
+    const char* LESS_OR_EQUAL_TO = "<=";
+    const char* EQUALS = "=";
+}
+
+namespace ComparePropertyStr{
+    const char* TRANSACTION_DATE_PROPERTY = "Transaction date";
+    const char* TRANSACTION_AMOUNT_PROPERTY = "Transaction amount";
+    const char* BALANCE_PROPERTY = "Balance";
+    const char* DESCRIPTION_PROPERTY = "Description";
+    const char* ACCOUNT_NAME_PROPERTY = "Account name";
+    const char* ACCOUNT_NUMBER_PROPERTY = "Account number";
+}
+
+
 namespace core{
 
 void Utils::showErrorMessage(std::string text){
@@ -21,6 +42,11 @@ std::vector<std::string> Utils::splitString(const std::string& s, const std::str
     tokens.push_back(subStr);
 
     return tokens;
+}
+
+std::string Utils::addLeadingZeroes(int minDigitCount, int num){
+    std::string strWithoutZeroes = std::to_string(num);
+    return std::string(minDigitCount - std::min(minDigitCount, (int)strWithoutZeroes.length()), '0') + strWithoutZeroes;;
 }
 
 bool Utils::isDate(std::string str){
@@ -114,6 +140,10 @@ std::tm Utils::toDate(std::string str){
     return ret;
 }
 
+std::string Utils::toString(std::tm date){
+    return std::to_string(date.tm_year + 1900) + "-" + addLeadingZeroes(2, date.tm_mon) + "-" + addLeadingZeroes(2, date.tm_mday);
+}
+
 double Utils::toNum(std::string str){
     double ret = 0;
     double decimal = 1;
@@ -174,6 +204,19 @@ int Utils::toInt(std::string str){
     return ret;
 }
 
+unsigned int Utils::toUInt(std::string str){
+    unsigned int ret = 0;
+    for(char& c:str){
+        if((unsigned int)c >= 48 && (unsigned int)c <= 57){
+            ret *= 10;
+            ret += (unsigned int)c -48;
+        }
+        else
+            break;   // If not number we return;
+    }
+    return ret;
+}
+
 std::vector<std::tuple<int, int>> Utils::sortKeysByVal(std::map<int, int>& inputMap){
     // Sorts a number of key by their corresponding values (biggest first), and returns the result as a vector
     std::vector<std::tuple<int, int>> ret;
@@ -191,7 +234,7 @@ std::vector<std::tuple<int, int>> Utils::sortKeysByVal(std::map<int, int>& input
     return ret;
 }
 
-DateComp Utils::compareDates(std::tm dateA, std::tm dateB){
+DateComp::DateComp Utils::compareDates(std::tm dateA, std::tm dateB){
     if(dateA.tm_year > dateB.tm_year)
         return DateComp::LATER;
     if(dateA.tm_year < dateB.tm_year)

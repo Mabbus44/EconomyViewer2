@@ -4,7 +4,7 @@
 #include <QFrame>
 #include <QPushButton>
 #include <QTableWidget>
-#include "../core/constants.h"
+#include "../core/transactionGroup.h"
 
 namespace core{
 class EconomyViewer;
@@ -18,17 +18,17 @@ class TransactionGroups: public QFrame
 public:
     TransactionGroups();
     TransactionGroups(QWidget* parent, core::EconomyViewer* core);
-    void populateTable();
     bool openView();
+    bool openView(std::map<unsigned int, core::TransactionGroup>& transactionGroups, bool appendTransactionGroups = false);
     QPushButton btnAddNewGroup;
     QPushButton btnDeleteGroup;
     QPushButton btnSaveChanges;
     QPushButton btnEditGroup;
     QTableWidget tblTransactionGroups;
 private:
-    bool checkCellFormat();
     void createViewElements();
     core::EconomyViewer* _core=nullptr;
+    std::map<unsigned int, core::TransactionGroup> _transactionGroups;
 
 public slots:
     void btnAddNewGroupClick(bool checked);

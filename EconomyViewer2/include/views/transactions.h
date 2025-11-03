@@ -24,6 +24,7 @@ public:
     bool openView(std::vector<core::Transaction>& transactions, bool appendTransactions = false);
     QPushButton btnAddTransactions;
     QPushButton btnManageAccounts;
+    QPushButton btnManageTransactionGroups;
     QPushButton btnApplyChanges;
     QTableWidget tblTransactions;
 private:
@@ -33,7 +34,7 @@ private:
     int checkRowFormat(int row);
     bool saveTransactionsToCore();
     void calculateAndSetColorOfRow(int row, bool alwaysSetColor=false);
-    void changeColorOfRow(int row, core::TransactionState state);
+    void changeColorOfRow(int row, TableRowState::TableRowState state);
     core::Transaction rowToTransaction(int row);
     core::EconomyViewer* _core=nullptr;
 
@@ -41,6 +42,7 @@ public slots:
     void tblTransactionsChanged(int row, int col);
     void btnAddTransactionsClick(bool checked);
     void btnManageAccountsClick(bool checked);
+    void btnManageTransactionGroupsClick(bool checked);
     void btnApplyChangesClick(bool checked);
 
 };

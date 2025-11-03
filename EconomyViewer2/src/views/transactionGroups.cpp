@@ -1,7 +1,7 @@
 #include "../../include/core/economyviewer.h"
 #include "../../include/views/transactionGroups.h"
 #include <QSizePolicy>
-#include <QtWidgets>
+#include <QLayout>
 
 namespace views{
 
@@ -54,13 +54,31 @@ void TransactionGroups::createViewElements(){
 }
 
 bool TransactionGroups::openView(){
-    tblTransactionGroups.setRowCount(3);
-    tblTransactionGroups.setColumnCount(2);
-    tblTransactionGroups.setHorizontalHeaderLabels({"Name","Hidden id"});
-    tblTransactionGroups.setItem(0, 0, new QTableWidgetItem("First groups"));
-    tblTransactionGroups.setItem(0, 1, new QTableWidgetItem("Grosserys"));
-    tblTransactionGroups.setItem(0, 2, new QTableWidgetItem("Car"));
+    std::map<unsigned int, core::TransactionGroup> emptyMap;
+    return openView(emptyMap, true);
+}
 
+bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>& transactionGroups, bool appendTransactionGroups){
+    if(appendTransactionGroups){
+        for(auto& mapEntry: transactionGroups)
+            _transactionGroups[mapEntry.first] = mapEntry.second;
+    }else
+        _transactionGroups = transactionGroups;
+
+    tblTransactionGroups.clear();
+    tblTransactionGroups.setRowCount(_transactionGroups.size());
+    tblTransactionGroups.setColumnCount(TransactionGroupColumns::COLUMN_COUNT);
+    tblTransactionGroups.hideColumn(TransactionGroupColumns::ID);
+    tblTransactionGroups.setHorizontalHeaderLabels({"Account name","Rules"});
+
+    int row = 0;
+    for(auto& mapEntry: _transactionGroups){
+        tblTransactionGroups.setItem(row, TransactionGroupColumns::ACCOUNT_NAME, new QTableWidgetItem(mapEntry.second.accountName().c_str()));
+        tblTransactionGroups.setItem(row, TransactionGroupColumns::RULES, new QTableWidgetItem(std::to_string(mapEntry.second.conditionCount()).c_str()));
+        tblTransactionGroups.setItem(row, TransactionGroupColumns::ID, new QTableWidgetItem(std::to_string(mapEntry.second.id()).c_str()));
+        row++;
+    }
+    tblTransactionGroups.resizeColumnsToContents();
     this->show();
     return true;
 }
@@ -69,7 +87,14 @@ void TransactionGroups::btnAddNewGroupClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
     int rowCount = tblTransactionGroups.rowCount();
     tblTransactionGroups.setRowCount(rowCount+1);
-    tblTransactionGroups.setItem(rowCount, 0, new QTableWidgetItem("New group"));
+    core::TransactionGroup newGroup;
+    newGroup.accountName("No account");
+    newGroup.accountNumber("0");
+    newGroup.id(_core->getUniqueTransactionGroupId());
+    _transactionGroups[newGroup.id()] = newGroup;
+    tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::ACCOUNT_NAME, new QTableWidgetItem(newGroup.accountName().c_str()));
+    tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::RULES, new QTableWidgetItem(std::to_string(newGroup.conditionCount()).c_str()));
+    tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::ID, new QTableWidgetItem(std::to_string(newGroup.id()).c_str()));
 }
 
 void TransactionGroups::btnDeleteGroupClick(bool checked){
@@ -77,44 +102,25 @@ void TransactionGroups::btnDeleteGroupClick(bool checked){
     QList<QTableWidgetItem*> selectedItems = tblTransactionGroups.selectedItems();
     if(selectedItems.size() == 0)
         return;
+    int row = selectedItems[0]->row();
+    unsigned int id = core::Utils::toUInt(tblTransactionGroups.item(row, TransactionGroupColumns::ID)->text().toStdString());
+    _transactionGroups.erase(id);
     tblTransactionGroups.removeRow(selectedItems[0]->row());
 }
 
 void TransactionGroups::btnSaveChangesClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
-    if(checkCellFormat()){
-    }
+    _core->updateTransactionGroups(_transactionGroups);
+    _core->openTransactionsView();
 }
 
 void TransactionGroups::btnEditGroupClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
-}
-
-bool TransactionGroups::checkCellFormat(){
-    int rowCount = tblTransactionGroups.rowCount();
-    int columnCount = tblTransactionGroups.columnCount();
-    if(columnCount < 1){
-        core::Utils::showErrorMessage("Groups table missing columns");
-        return false;
-    }
-    bool cellsOk = true;
-    std::vector<std::string> usedGroupNames;
-    for(int row=0; row < rowCount; row++){
-        std::string name = tblTransactionGroups.item(row, 0)->text().toStdString();
-        bool rowOk = true;
-        for(std::string& usedGroupName: usedGroupNames)
-            if(name == usedGroupName)
-                rowOk = false;
-        if(name == "")
-            rowOk = false;
-        if(rowOk){
-            tblTransactionGroups.item(row, 0)->setBackground(Qt::white);
-        }else{
-            cellsOk = false;
-            tblTransactionGroups.item(row, 0)->setBackground(Qt::red);
-        }
-        usedGroupNames.push_back(name);
-    }
-    return cellsOk;
+    QList<QTableWidgetItem*> selectedItems = tblTransactionGroups.selectedItems();
+    if(selectedItems.size() == 0)
+        return;
+    int row = selectedItems[0]->row();
+    unsigned int id = core::Utils::toUInt(tblTransactionGroups.item(row, TransactionGroupColumns::ID)->text().toStdString());
+    _core->openMatchConditionsView(_transactionGroups[id]);
 }
 }

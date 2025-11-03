@@ -4,7 +4,22 @@
 
 namespace core{
 
-EconomyViewer::EconomyViewer() {}
+EconomyViewer::EconomyViewer() {
+    /*TransactionGroup t1;
+    t1.accountName("acc1");
+    t1.accountNumber("num1");
+    TransactionGroup t2;
+    t2.accountName("acc2");
+    t2.accountNumber("num2");
+    std::list<MatchCondition> m;
+    MatchCondition m1;
+    MatchCondition m2;
+    m.push_back(m1);
+    m.push_back(m2);
+    t1.matchConditions(m);
+    _transactionGroups.push_back(t1);
+    _transactionGroups.push_back(t2);*/
+}
 
 int EconomyViewer::run(int argc, char **argv) {
     QApplication app (argc, argv);
@@ -21,6 +36,12 @@ int EconomyViewer::run(int argc, char **argv) {
     accountsView.reset(new views::Accounts(window.get(), this));
     accountsView->hide();
 
+    transactionGroupsView.reset(new views::TransactionGroups(window.get(), this));
+    transactionGroupsView->hide();
+
+    matchConditionsView.reset(new views::MatchConditions(window.get(), this));
+    matchConditionsView->hide();
+
     return app.exec();
 }
 
@@ -36,10 +57,10 @@ void EconomyViewer::closeCurrentView(){
         accountsView->hide();
         break;
     case ViewNames::TRANSACTIONS_GROUPS:
+        transactionGroupsView->hide();
         break;
-    case ViewNames::EDIT_TRANSACTION_GROUP:
-        break;
-    case ViewNames::CHANGE_TRANSACTIONS:
+    case ViewNames::MATCH_CONDITIONS:
+        matchConditionsView->hide();
         break;
     default:
         break;
@@ -78,17 +99,27 @@ void EconomyViewer::openAccountsView(bool useCoreAccountsVector){
     currentView = ViewNames::MANAGE_ACCOUNTS;
 }
 
-void EconomyViewer::openTransactionGroupsView(){
+void EconomyViewer::openTransactionGroupsView(bool useCoreTransactionGroupsVector){
     closeCurrentView();
-    transactionGroupsView->openView();
+    if(useCoreTransactionGroupsVector)
+        transactionGroupsView->openView(_transactionGroups);
+    else
+        transactionGroupsView->openView();
+
     currentView = ViewNames::TRANSACTIONS_GROUPS;
 }
 
-void EconomyViewer::addNewTransactions(std::vector<Transaction>& newTransactions){
-    for(Transaction& transaction: newTransactions){
-        unsigned int id = transaction.getId();
-        _transactions[id] = transaction;
-    }
+void EconomyViewer::openTransactionGroupsView(std::map<unsigned int, core::TransactionGroup>& transactionGroups){
+    closeCurrentView();
+    transactionGroupsView->openView(transactionGroups, true);
+
+    currentView = ViewNames::TRANSACTIONS_GROUPS;
+}
+
+void EconomyViewer::openMatchConditionsView(core::TransactionGroup& transactionGroup){
+    closeCurrentView();
+    matchConditionsView->openView(transactionGroup);
+    currentView = ViewNames::MATCH_CONDITIONS;
 }
 
 void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){
@@ -104,19 +135,27 @@ void EconomyViewer::updateTransactions(std::vector<Transaction>& updatedTransact
     core::Utils::showErrorMessage("Update core transactions, new size: " + std::to_string(_transactions.size()));
 }
 
-unsigned int EconomyViewer::getUniqueId(){
+void EconomyViewer::updateTransactionGroups(std::map<unsigned int, core::TransactionGroup>& updatedTransactionGroups){
+    _transactionGroups = updatedTransactionGroups;
+}
+
+unsigned int EconomyViewer::getUniqueTransactionId(){
     return _transactionId++;
 }
 
-TransactionState EconomyViewer::getTransactionState(core::Transaction& transaction){
+unsigned int EconomyViewer::getUniqueTransactionGroupId(){
+    return _transactionGroupId++;
+}
+
+TableRowState::TableRowState EconomyViewer::getTableRowState(core::Transaction& transaction){
     unsigned int id = transaction.getId();
     if(_transactions.count(id)){
         if(_transactions[id] == transaction)
-            return TransactionState::UNCHANGED;
+            return TableRowState::UNCHANGED;
         else
-            return TransactionState::CHANGED;
+            return TableRowState::CHANGED;
     }
-    return TransactionState::NEW;
+    return TableRowState::NEW;
 }
 
 }
