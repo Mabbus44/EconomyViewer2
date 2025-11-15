@@ -22,6 +22,7 @@ public:
     bool openView(std::map<unsigned int, core::TransactionGroup>& transactionGroups, bool appendTransactionGroups = false);
     QPushButton btnAddNewGroup;
     QPushButton btnDeleteGroup;
+    QPushButton btnCancel;
     QPushButton btnSaveChanges;
     QPushButton btnEditGroup;
     QTableWidget tblTransactionGroups;
@@ -33,6 +34,7 @@ private:
 public slots:
     void btnAddNewGroupClick(bool checked);
     void btnDeleteGroupClick(bool checked);
+    void btnCancelClick(bool checked);
     void btnSaveChangesClick(bool checked);
     void btnEditGroupClick(bool checked);
 };

@@ -6,7 +6,7 @@
 
 
 namespace TransactionGroupColumns{ enum TransactionGroupColumns{
-    ACCOUNT_NAME,
+    GROUP_NAME,
     RULES,
     ID,
     COLUMN_COUNT,
@@ -36,6 +36,7 @@ namespace TransactionColumns{ enum TransactionColumns{
     BALANCE,
     DESCRIPTION,
     ACCOUNT,
+    GROUP,
     ID,
     STATUS,
     COLUMN_COUNT,
@@ -92,8 +93,7 @@ namespace CompareProperty{ enum CompareProperty{
     TRANSACTION_AMOUNT_PROPERTY,
     BALANCE_PROPERTY,
     DESCRIPTION_PROPERTY,
-    ACCOUNT_NAME_PROPERTY,
-    ACCOUNT_NUMBER_PROPERTY
+    ACCOUNT_NAME_PROPERTY
 };}
 
 namespace ComparePropertyStr{
@@ -102,7 +102,6 @@ namespace ComparePropertyStr{
     extern const char* BALANCE_PROPERTY;
     extern const char* DESCRIPTION_PROPERTY;
     extern const char* ACCOUNT_NAME_PROPERTY;
-    extern const char* ACCOUNT_NUMBER_PROPERTY;
 }
 
 namespace core{
@@ -111,17 +110,25 @@ class Utils{
 public:
     Utils(){};
     ~Utils(){};
+
     static void showErrorMessage(std::string text);
+
     static std::vector<std::string> splitString(const std::string& s, const std::string& delimiter);
     static std::string addLeadingZeroes(int minDigitCount, int num);
+    static bool isEmpty(std::string str);
+
     static bool isDate(std::string str);
     static bool isNum(std::string str);
+
     static std::tm toDate(std::string str);
     static std::string toString(std::tm date);
+    static std::string toLower(std::string str);
     static double toNum(std::string str);
     static int toInt(std::string str);
     static unsigned int toUInt(std::string str);
+
     static std::vector<std::tuple<int, int>> sortKeysByVal(std::map<int, int>& inputMap);
+
     static DateComp::DateComp compareDates(std::tm dateA, std::tm dateB);
 };
 

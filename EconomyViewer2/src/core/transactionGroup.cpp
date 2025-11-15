@@ -12,4 +12,11 @@ TableRowState::TableRowState TransactionGroup::getTableRowState(const core::Matc
     return TableRowState::NEW;
 }
 
+bool TransactionGroup::isMatch(Transaction& transaction){
+    for (auto& [key, val] : _matchConditions)
+        if(val.isMatch(transaction))
+            return true;
+    return false;
+}
+
 }

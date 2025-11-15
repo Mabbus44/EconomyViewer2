@@ -54,6 +54,7 @@ public:
     unsigned int getUniqueTransactionId();
     unsigned int getUniqueTransactionGroupId();
     TableRowState::TableRowState getTableRowState(core::Transaction& transaction);
+    std::map<unsigned int, core::TransactionGroup>& transactionGroupsRef() {return _transactionGroups;};
 
 private:
     std::vector<Account> _accounts;

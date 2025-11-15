@@ -27,6 +27,10 @@ void TransactionGroups::createViewElements(){
     btnEditGroup.setText("Edit group");
     btnEditGroup.setToolTip("Edit selected transation group");
     btnEditGroup.show();
+    btnCancel.setParent(this);
+    btnCancel.setText("Cancel");
+    btnCancel.setToolTip("Cancel changes and return to main page");
+    btnCancel.show();
     btnSaveChanges.setParent(this);
     btnSaveChanges.setText("Save changes");
     btnSaveChanges.setToolTip("Save changes to the list and return to main page");
@@ -44,6 +48,7 @@ void TransactionGroups::createViewElements(){
     layout->addWidget(&btnDeleteGroup);
     layout->addWidget(&btnEditGroup);
     layout->addWidget(&btnSaveChanges);
+    layout->addWidget(&btnCancel);
     this->setLayout(layout);
 
     this->show();
@@ -51,6 +56,7 @@ void TransactionGroups::createViewElements(){
     QObject::connect(&btnDeleteGroup, &QPushButton::clicked, this, &TransactionGroups::btnDeleteGroupClick);
     QObject::connect(&btnEditGroup, &QPushButton::clicked, this, &TransactionGroups::btnEditGroupClick);
     QObject::connect(&btnSaveChanges, &QPushButton::clicked, this, &TransactionGroups::btnSaveChangesClick);
+    QObject::connect(&btnCancel, &QPushButton::clicked, this, &TransactionGroups::btnCancelClick);
 }
 
 bool TransactionGroups::openView(){
@@ -69,11 +75,11 @@ bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>&
     tblTransactionGroups.setRowCount(_transactionGroups.size());
     tblTransactionGroups.setColumnCount(TransactionGroupColumns::COLUMN_COUNT);
     tblTransactionGroups.hideColumn(TransactionGroupColumns::ID);
-    tblTransactionGroups.setHorizontalHeaderLabels({"Account name","Rules"});
+    tblTransactionGroups.setHorizontalHeaderLabels({"Group name","Rules"});
 
     int row = 0;
     for(auto& mapEntry: _transactionGroups){
-        tblTransactionGroups.setItem(row, TransactionGroupColumns::ACCOUNT_NAME, new QTableWidgetItem(mapEntry.second.accountName().c_str()));
+        tblTransactionGroups.setItem(row, TransactionGroupColumns::GROUP_NAME, new QTableWidgetItem(mapEntry.second.groupName().c_str()));
         tblTransactionGroups.setItem(row, TransactionGroupColumns::RULES, new QTableWidgetItem(std::to_string(mapEntry.second.conditionCount()).c_str()));
         tblTransactionGroups.setItem(row, TransactionGroupColumns::ID, new QTableWidgetItem(std::to_string(mapEntry.second.id()).c_str()));
         row++;
@@ -88,11 +94,10 @@ void TransactionGroups::btnAddNewGroupClick(bool checked){
     int rowCount = tblTransactionGroups.rowCount();
     tblTransactionGroups.setRowCount(rowCount+1);
     core::TransactionGroup newGroup;
-    newGroup.accountName("No account");
-    newGroup.accountNumber("0");
+    newGroup.groupName("No group");
     newGroup.id(_core->getUniqueTransactionGroupId());
     _transactionGroups[newGroup.id()] = newGroup;
-    tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::ACCOUNT_NAME, new QTableWidgetItem(newGroup.accountName().c_str()));
+    tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::GROUP_NAME, new QTableWidgetItem(newGroup.groupName().c_str()));
     tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::RULES, new QTableWidgetItem(std::to_string(newGroup.conditionCount()).c_str()));
     tblTransactionGroups.setItem(rowCount, TransactionGroupColumns::ID, new QTableWidgetItem(std::to_string(newGroup.id()).c_str()));
 }
@@ -111,6 +116,11 @@ void TransactionGroups::btnDeleteGroupClick(bool checked){
 void TransactionGroups::btnSaveChangesClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
     _core->updateTransactionGroups(_transactionGroups);
+    _core->openTransactionsView();
+}
+
+void TransactionGroups::btnCancelClick(bool checked){
+    if(checked){}     //Remove warning "checked unused"
     _core->openTransactionsView();
 }
 

@@ -25,6 +25,7 @@ public:
     QPushButton btnAddTransactions;
     QPushButton btnManageAccounts;
     QPushButton btnManageTransactionGroups;
+    QPushButton btnApplyTransactionGroups;
     QPushButton btnApplyChanges;
     QTableWidget tblTransactions;
 private:
@@ -35,6 +36,7 @@ private:
     bool saveTransactionsToCore();
     void calculateAndSetColorOfRow(int row, bool alwaysSetColor=false);
     void changeColorOfRow(int row, TableRowState::TableRowState state);
+    void applyTransactionGroups();
     core::Transaction rowToTransaction(int row);
     core::EconomyViewer* _core=nullptr;
 
@@ -43,6 +45,7 @@ public slots:
     void btnAddTransactionsClick(bool checked);
     void btnManageAccountsClick(bool checked);
     void btnManageTransactionGroupsClick(bool checked);
+    void btnApplyTransactionGroupsClick(bool checked);
     void btnApplyChangesClick(bool checked);
 
 };

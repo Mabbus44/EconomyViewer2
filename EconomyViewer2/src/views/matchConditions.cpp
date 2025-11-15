@@ -23,6 +23,10 @@ void MatchConditions::createViewElements(){
     btnDeleteMatchCondition.setText("Delete condition");
     btnDeleteMatchCondition.setToolTip("Deletes selection match condition");
     btnDeleteMatchCondition.show();
+    btnCancel.setParent(this);
+    btnCancel.setText("Cancel");
+    btnCancel.setToolTip("Cancel changes and return to main page");
+    btnCancel.show();
     btnSaveChanges.setParent(this);
     btnSaveChanges.setText("Save changes");
     btnSaveChanges.setToolTip("Save changes to the list and return to main page");
@@ -39,6 +43,7 @@ void MatchConditions::createViewElements(){
     layout->addWidget(&btnAddNewMatchCondition);
     layout->addWidget(&btnDeleteMatchCondition);
     layout->addWidget(&btnSaveChanges);
+    layout->addWidget(&btnCancel);
     this->setLayout(layout);
 
     this->show();
@@ -46,6 +51,7 @@ void MatchConditions::createViewElements(){
     QObject::connect(&btnAddNewMatchCondition, &QPushButton::clicked, this, &MatchConditions::btnAddNewMatchConditionClick);
     QObject::connect(&btnDeleteMatchCondition, &QPushButton::clicked, this, &MatchConditions::btnDeleteMatchConditionClick);
     QObject::connect(&btnSaveChanges, &QPushButton::clicked, this, &MatchConditions::btnSaveChangesClick);
+    QObject::connect(&btnCancel, &QPushButton::clicked, this, &MatchConditions::btnCancelClick);
 }
 
 bool MatchConditions::openView(core::TransactionGroup& transactionGroup){
@@ -97,7 +103,6 @@ QComboBox* MatchConditions::createComparePropertyComboBox(){
     comparePropertyComboBox->addItem(ComparePropertyStr::BALANCE_PROPERTY, CompareProperty::BALANCE_PROPERTY);
     comparePropertyComboBox->addItem(ComparePropertyStr::DESCRIPTION_PROPERTY, CompareProperty::DESCRIPTION_PROPERTY);
     comparePropertyComboBox->addItem(ComparePropertyStr::ACCOUNT_NAME_PROPERTY, CompareProperty::ACCOUNT_NAME_PROPERTY);
-    comparePropertyComboBox->addItem(ComparePropertyStr::ACCOUNT_NUMBER_PROPERTY, CompareProperty::ACCOUNT_NUMBER_PROPERTY);
     return comparePropertyComboBox;
 }
 
@@ -141,9 +146,6 @@ void MatchConditions::setComparePropertyComboBoxIndex(QComboBox* comboBox, Compa
         break;
     case CompareProperty::ACCOUNT_NAME_PROPERTY:
         comboBox->setCurrentIndex(4);
-        break;
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
-        comboBox->setCurrentIndex(5);
         break;
     }
 }
@@ -200,7 +202,6 @@ int MatchConditions::checkRowFormat(int row){
         break;
     case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
     case CompareProperty::BALANCE_PROPERTY:
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
         if(!core::Utils::isNum(value))
             return MatchConditionColumns::VALUE;
         break;
@@ -358,6 +359,11 @@ void MatchConditions::btnDeleteMatchConditionClick(bool checked){
     if(selectedItems.size() == 0)
         return;
     tblMatchConditions.removeRow(selectedItems[0]->row());
+}
+
+void MatchConditions::btnCancelClick(bool checked){
+    if(checked){}     //Remove warning "checked unused"
+    _core->openTransactionGroupsView();
 }
 
 void MatchConditions::btnSaveChangesClick(bool checked){

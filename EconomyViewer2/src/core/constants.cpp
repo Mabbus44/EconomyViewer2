@@ -17,7 +17,6 @@ namespace ComparePropertyStr{
     const char* BALANCE_PROPERTY = "Balance";
     const char* DESCRIPTION_PROPERTY = "Description";
     const char* ACCOUNT_NAME_PROPERTY = "Account name";
-    const char* ACCOUNT_NUMBER_PROPERTY = "Account number";
 }
 
 
@@ -47,6 +46,13 @@ std::vector<std::string> Utils::splitString(const std::string& s, const std::str
 std::string Utils::addLeadingZeroes(int minDigitCount, int num){
     std::string strWithoutZeroes = std::to_string(num);
     return std::string(minDigitCount - std::min(minDigitCount, (int)strWithoutZeroes.length()), '0') + strWithoutZeroes;;
+}
+
+bool Utils::isEmpty(std::string str){
+    for(char& c: str)
+        if(c!=' ')
+            return false;
+    return true;
 }
 
 bool Utils::isDate(std::string str){
@@ -142,6 +148,13 @@ std::tm Utils::toDate(std::string str){
 
 std::string Utils::toString(std::tm date){
     return std::to_string(date.tm_year + 1900) + "-" + addLeadingZeroes(2, date.tm_mon) + "-" + addLeadingZeroes(2, date.tm_mday);
+}
+
+std::string Utils::toLower(std::string str){
+    std::transform(str.begin(), str.end(), str.begin(),
+                   [](unsigned char c){ return std::tolower(c); }
+                   );
+    return str;
 }
 
 double Utils::toNum(std::string str){

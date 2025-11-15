@@ -42,6 +42,11 @@ bool Transaction::operator==(const Transaction& other) const{
     if(this->_toAccount != other._toAccount)
         return false;
 
+    if(this->_hasGroup != other._hasGroup)
+        return false;
+    if(this->_group != other._group)
+        return false;
+
     return true;
 }
 
@@ -75,6 +80,11 @@ void Transaction::setToAccount(std::string accountName){
     _toAccount = accountName;
 }
 
+void Transaction::setGroup(std::string group){
+    _hasGroup = true;
+    _group = group;
+}
+
 void Transaction::setId(unsigned int id){
     _hasId = true;
     _id = id;
@@ -103,21 +113,27 @@ std::string Transaction::getTransactionAmountAsString(){
     return "";
 }
 
-std::string Transaction::getDescriptionAsString(){
+std::string Transaction::description(){
     if(_hasDescription)
         return _description;
     return "";
 }
 
-std::string Transaction::getFromAccountAsString(){
+std::string Transaction::fromAccount(){
     if(_hasFromAccount)
         return _fromAccount;
     return "";
 }
 
-std::string Transaction::getToAccountAsString(){
+std::string Transaction::toAccount(){
     if(_hasToAccount)
         return _toAccount;
+    return "";
+}
+
+std::string Transaction::group(){
+    if(_hasGroup)
+        return _group;
     return "";
 }
 
@@ -127,10 +143,29 @@ std::string Transaction::getIdAsString(){
     return "";
 }
 
+int Transaction::balance(){
+    if(_hasBalance)
+        return _balance;
+    return 0;
+}
+
+int Transaction::transactionAmount(){
+    if(_hasTransactionAmount)
+        return _transactionAmount;
+    return 0;
+}
+
 unsigned int Transaction::getId(){
     if(_hasId)
         return _id;
     return 0;
+}
+
+std::tm Transaction::transactionDate(){
+    if(_hasTransactionDate)
+        return _transactionDate;
+    std::tm ret;
+    return ret;
 }
 }
 

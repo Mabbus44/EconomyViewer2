@@ -1,10 +1,5 @@
 TODO:
 MVP
-* Change "account name" to "Transaction group" on transaction groups page
-* Remove account number as match condition field
-* "Discard changes" button on match conditions page
-* "Discard changes" button on transaction groups page
-* Add apply match condition button to transaction view
 * Save to file
 * Load from file
 * View graph page
@@ -23,6 +18,17 @@ Others
 * Add "last x years", "last x months", "last x calendar years" as quick x axis selections in graph page
 * Add "month average", "3 month average", "year average" as selections in graph page
 * Namme and save graph settings in graph page (part of the data in the normal save, not a separate file).
+* Yellow/green colors for changed/new fields in accountsView
+* Yellow/green colors for changed/new fields in transactionGroupsView
+
+done
+
+v0.06
+* Change "account name" to "Transaction group" on transaction groups page
+* Remove account number as match condition field
+* "Discard changes" button on match conditions page
+* "Discard changes" button on transaction groups page
+* Add apply match conditions button to transaction view
 
 v0.05
 * Add transactionsGroups and matchConditions pages

@@ -11,21 +11,19 @@ class TransactionGroup
 public:
     TransactionGroup(){}
     ~TransactionGroup(){}
-    std::string accountName() {return _accountName;}
-    std::string accountNumber() {return _accountNumber;}
-    std::map<unsigned int, MatchCondition> matchConditions() {return _matchConditions;}
-    std::map<unsigned int, MatchCondition>& matchConditionsRef() {return _matchConditions;}
+    std::string groupName() {return _groupName;}
     unsigned int id() {return _id;}
-    void accountName(std::string accountName){_accountName = accountName;}
-    void accountNumber(std::string accountNumber){_accountNumber = accountNumber;}
+    unsigned int getUniqueMatchConditionId() {return _matchConditionId++;}
+    int conditionCount() {return _matchConditions.size();}
+    bool isMatch(Transaction& transaction);
+    void groupName(std::string groupName){_groupName = groupName;}
     void matchConditions(std::map<unsigned int, MatchCondition> matchConditions){_matchConditions = matchConditions;}
     void id(unsigned int id) {_id = id;}
-    int conditionCount() {return _matchConditions.size();}
-    unsigned int getUniqueMatchConditionId() {return _matchConditionId++;}
     TableRowState::TableRowState getTableRowState(const core::MatchCondition& matchCondition);
+    std::map<unsigned int, MatchCondition> matchConditions() {return _matchConditions;}
+    std::map<unsigned int, MatchCondition>& matchConditionsRef() {return _matchConditions;}
 private:
-    std::string _accountName;
-    std::string _accountNumber;
+    std::string _groupName;
     std::map<unsigned int, MatchCondition> _matchConditions;
     unsigned int _id = 0;
     unsigned int _matchConditionId = 1;

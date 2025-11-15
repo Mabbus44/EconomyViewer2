@@ -22,6 +22,7 @@ public:
     bool openView(core::TransactionGroup& transactionGroup);
     QPushButton btnAddNewMatchCondition;
     QPushButton btnDeleteMatchCondition;
+    QPushButton btnCancel;
     QPushButton btnSaveChanges;
     QTableWidget tblMatchConditions;
 private:
@@ -45,6 +46,7 @@ public slots:
     void tblMatchConditionsChanged(int row, int col);
     void btnAddNewMatchConditionClick(bool checked);
     void btnDeleteMatchConditionClick(bool checked);
+    void btnCancelClick(bool checked);
     void btnSaveChangesClick(bool checked);
 };
 

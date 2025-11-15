@@ -2,6 +2,7 @@
 #define MATCHCONDITION_H
 
 #include "../core/constants.h"
+#include "../core/transaction.h"
 
 namespace core{
 
@@ -11,6 +12,8 @@ namespace core{
         MatchCondition(){}
         ~MatchCondition(){}
         bool operator==(const MatchCondition& other) const;
+
+        bool isMatch(Transaction& transaction);
 
         void compareType(CompareType::CompareType c){_compareType = c;}
         void compareProperty(CompareProperty::CompareProperty c){_compareProperty = c;}
@@ -34,6 +37,10 @@ namespace core{
         static CompareType::CompareType stringToCompareType(std::string compareType);
         static CompareProperty::CompareProperty stringToCompareProperty(std::string compareProperty);
     private:
+        bool isDateMatch(std::tm date);
+        bool isStringMatch(std::string str);
+        bool isIntMatch(int num);
+
         CompareType::CompareType _compareType;
         CompareProperty::CompareProperty _compareProperty;
         std::tm _valueDate;

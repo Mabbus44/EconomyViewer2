@@ -5,20 +5,6 @@
 namespace core{
 
 EconomyViewer::EconomyViewer() {
-    /*TransactionGroup t1;
-    t1.accountName("acc1");
-    t1.accountNumber("num1");
-    TransactionGroup t2;
-    t2.accountName("acc2");
-    t2.accountNumber("num2");
-    std::list<MatchCondition> m;
-    MatchCondition m1;
-    MatchCondition m2;
-    m.push_back(m1);
-    m.push_back(m2);
-    t1.matchConditions(m);
-    _transactionGroups.push_back(t1);
-    _transactionGroups.push_back(t2);*/
 }
 
 int EconomyViewer::run(int argc, char **argv) {
@@ -132,7 +118,6 @@ void EconomyViewer::updateTransactions(std::vector<Transaction>& updatedTransact
         unsigned int id = transaction.getId();
         _transactions[id] = transaction;
     }
-    core::Utils::showErrorMessage("Update core transactions, new size: " + std::to_string(_transactions.size()));
 }
 
 void EconomyViewer::updateTransactionGroups(std::map<unsigned int, core::TransactionGroup>& updatedTransactionGroups){

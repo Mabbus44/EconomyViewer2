@@ -14,7 +14,6 @@ bool MatchCondition::operator==(const MatchCondition& other) const{
         break;
     case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
     case CompareProperty::BALANCE_PROPERTY:
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
         if(this->_valueInt != other._valueInt)
             return false;
         break;
@@ -27,6 +26,73 @@ bool MatchCondition::operator==(const MatchCondition& other) const{
     return true;
 }
 
+bool MatchCondition::isMatch(Transaction& transaction){
+    switch(_compareProperty){
+    case CompareProperty::TRANSACTION_DATE_PROPERTY:
+        return isDateMatch(transaction.transactionDate());
+    case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
+        return isIntMatch(transaction.transactionAmount());
+    case CompareProperty::BALANCE_PROPERTY:
+        return isIntMatch(transaction.balance());
+    case CompareProperty::DESCRIPTION_PROPERTY:
+        return isStringMatch(transaction.description());
+    case CompareProperty::ACCOUNT_NAME_PROPERTY:
+        return isStringMatch(transaction.fromAccount()) || isStringMatch(transaction.toAccount());
+    }
+}
+
+bool MatchCondition::isDateMatch(std::tm date){
+    DateComp::DateComp relation = core::Utils::compareDates(date, _valueDate);
+    switch(_compareType){
+    case CompareType::GRATER_THAN:
+        return relation == DateComp::LATER;
+    case CompareType::LESS_THAN:
+        return relation == DateComp::EARLIER;
+    case CompareType::GRATER_OR_EQUAL_TO:
+        return relation == DateComp::LATER || relation == DateComp::SAME_TIME;
+    case CompareType::LESS_OR_EQUAL_TO:
+        return relation == DateComp::EARLIER || relation == DateComp::SAME_TIME;
+    case CompareType::EQUALS:
+        return relation == DateComp::SAME_TIME;
+    default:
+        return false;
+    }
+}
+
+bool MatchCondition::isStringMatch(std::string str){
+    str = core::Utils::toLower(str);
+    std::string val = core::Utils::toLower(_valueString);
+    switch(_compareType){
+    case CompareType::CONTAINS:
+        return str.find(val) != std::string::npos;
+    case CompareType::STARTS_WITH:
+        return str.starts_with(val);
+    case CompareType::ENDS_WITH:
+        return str.ends_with(val);
+    case CompareType::EQUALS:
+        return str == val;
+    default:
+        return false;
+    }
+}
+
+bool MatchCondition::isIntMatch(int num){
+    switch(_compareType){
+    case CompareType::GRATER_THAN:
+        return num > _valueInt;
+    case CompareType::LESS_THAN:
+        return num < _valueInt;
+    case CompareType::GRATER_OR_EQUAL_TO:
+        return num >= _valueInt;
+    case CompareType::LESS_OR_EQUAL_TO:
+        return num <= _valueInt;
+    case CompareType::EQUALS:
+        return num == _valueInt;
+    default:
+        return false;
+    }
+}
+
 std::string MatchCondition::getValueAsString() const{
     switch(_compareProperty){
     case CompareProperty::TRANSACTION_DATE_PROPERTY:
@@ -34,7 +100,6 @@ std::string MatchCondition::getValueAsString() const{
         break;
     case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
     case CompareProperty::BALANCE_PROPERTY:
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
         return std::to_string((_valueInt));
         break;
     case CompareProperty::DESCRIPTION_PROPERTY:
@@ -52,7 +117,6 @@ void MatchCondition::setValueWithString(std::string value){
         break;
     case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
     case CompareProperty::BALANCE_PROPERTY:
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
         _valueInt = core::Utils::toInt(value);
         break;
     case CompareProperty::DESCRIPTION_PROPERTY:
@@ -129,9 +193,6 @@ std::string MatchCondition::comparePropertyToString(CompareProperty::CompareProp
     case CompareProperty::ACCOUNT_NAME_PROPERTY:
         return ComparePropertyStr::ACCOUNT_NAME_PROPERTY;
         break;
-    case CompareProperty::ACCOUNT_NUMBER_PROPERTY:
-        return ComparePropertyStr::ACCOUNT_NUMBER_PROPERTY;
-        break;
     }
     return "error";
 }
@@ -147,8 +208,6 @@ CompareProperty::CompareProperty MatchCondition::stringToCompareProperty(std::st
         return CompareProperty::DESCRIPTION_PROPERTY;
     if(compareProperty == ComparePropertyStr::ACCOUNT_NAME_PROPERTY)
         return CompareProperty::ACCOUNT_NAME_PROPERTY;
-    if(compareProperty == ComparePropertyStr::ACCOUNT_NUMBER_PROPERTY)
-        return CompareProperty::ACCOUNT_NUMBER_PROPERTY;
     return CompareProperty::DESCRIPTION_PROPERTY;
 }
 
