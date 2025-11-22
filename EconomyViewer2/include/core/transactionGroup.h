@@ -3,6 +3,7 @@
 
 #include <map>
 #include "../core/matchCondition.h"
+#include "../../include/core/jsonNode.h"
 
 namespace core{
 
@@ -11,6 +12,7 @@ class TransactionGroup
 public:
     TransactionGroup(){}
     ~TransactionGroup(){}
+    bool operator==(const TransactionGroup& other) const;
     std::string groupName() {return _groupName;}
     unsigned int id() {return _id;}
     unsigned int getUniqueMatchConditionId() {return _matchConditionId++;}
@@ -22,6 +24,9 @@ public:
     TableRowState::TableRowState getTableRowState(const core::MatchCondition& matchCondition);
     std::map<unsigned int, MatchCondition> matchConditions() {return _matchConditions;}
     std::map<unsigned int, MatchCondition>& matchConditionsRef() {return _matchConditions;}
+    bool fromJson(JsonNode node);
+    JsonNode toJson();
+    void clear() {_matchConditions.clear(); _id = 0; _matchConditionId = 1;};
 private:
     std::string _groupName;
     std::map<unsigned int, MatchCondition> _matchConditions;

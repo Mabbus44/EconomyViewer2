@@ -39,6 +39,7 @@ bool MatchCondition::isMatch(Transaction& transaction){
     case CompareProperty::ACCOUNT_NAME_PROPERTY:
         return isStringMatch(transaction.fromAccount()) || isStringMatch(transaction.toAccount());
     }
+    return false;
 }
 
 bool MatchCondition::isDateMatch(std::tm date){
@@ -209,6 +210,75 @@ CompareProperty::CompareProperty MatchCondition::stringToCompareProperty(std::st
     if(compareProperty == ComparePropertyStr::ACCOUNT_NAME_PROPERTY)
         return CompareProperty::ACCOUNT_NAME_PROPERTY;
     return CompareProperty::DESCRIPTION_PROPERTY;
+}
+
+bool MatchCondition::fromJson(JsonNode node){
+    if(node.type() != JsonNodeType::OBJECT)
+        return false;
+    clear();
+    auto& obj = node.objectRef();
+
+    if(obj.count("_compareType")){
+        auto node = *obj["_compareType"];
+        if(node.type() != JsonNodeType::VALUE)
+            return false;
+        _compareType = stringToCompareType(node.value());
+    }else
+        return false;
+    if(obj.count("_compareProperty")){
+        auto node = *obj["_compareProperty"];
+        if(node.type() != JsonNodeType::VALUE)
+            return false;
+        _compareProperty = stringToCompareProperty(node.value());
+    }else
+        return false;
+    if(obj.count("_valueDate")){
+        auto node = *obj["_valueDate"];
+        if(node.type() != JsonNodeType::VALUE){
+        }else
+            _valueDate = Utils::toDate(node.value());
+    }
+    if(obj.count("_valueString")){
+        auto node = *obj["_valueString"];
+        if(node.type() != JsonNodeType::VALUE){
+        }else
+            _valueString = node.value();
+    }
+    if(obj.count("_valueInt")){
+        auto node = *obj["_valueInt"];
+        if(node.type() != JsonNodeType::VALUE){
+        }else
+            _valueInt = node.valueAsInt();
+    }
+    if(obj.count("_id")){
+        auto id = *obj["_id"];
+        if(id.type() != JsonNodeType::VALUE)
+            return false;
+        _id = id.valueAsInt();
+    }else
+        return false;
+    return true;
+}
+
+JsonNode MatchCondition::toJson(){
+    JsonNode node;
+    node.addToObject("_compareType", compareTypeToString(_compareType));
+    node.addToObject("_compareProperty", comparePropertyToString(_compareProperty));
+    node.addToObject("_id", std::to_string(_id));
+    switch(_compareProperty){
+    case CompareProperty::TRANSACTION_DATE_PROPERTY:
+        node.addToObject("_valueDate", Utils::toString(_valueDate));
+        break;
+    case CompareProperty::TRANSACTION_AMOUNT_PROPERTY:
+    case CompareProperty::BALANCE_PROPERTY:
+        node.addToObject("_valueInt", std::to_string(_valueInt));
+        break;
+    case CompareProperty::DESCRIPTION_PROPERTY:
+    case CompareProperty::ACCOUNT_NAME_PROPERTY:
+        node.addToObject("_valueString", _valueString);
+        break;
+    }
+    return node;
 }
 
 }

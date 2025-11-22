@@ -5,6 +5,7 @@
 #include <QSizePolicy>
 #include <QColor>
 #include <QLayout>
+#include <QFileDialog>
 
 namespace views{
 
@@ -48,18 +49,14 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
         tblTransactions.setItem(row, TransactionColumns::DESCRIPTION, new QTableWidgetItem(transaction.description().c_str()));
         tblTransactions.setItem(row, TransactionColumns::ACCOUNT, new QTableWidgetItem(transaction.fromAccount().c_str()));
         tblTransactions.setItem(row, TransactionColumns::GROUP, new QTableWidgetItem(transaction.group().c_str()));
-        for(int col=0; col<TransactionColumns::COLUMN_COUNT; col++){
-            if(col != TransactionColumns::ID && col != TransactionColumns::STATUS)
-                tblTransactions.item(row, col)->setBackground(Qt::green);
-        }
         tblTransactions.setItem(row, TransactionColumns::ID, new QTableWidgetItem(transaction.getIdAsString().c_str()));
         TableRowState::TableRowState state;
         int errorCol = checkRowFormat(row);
         if(errorCol == -1)
-            state = _core->getTableRowState(transaction);
+            state = _core->getTransactionTableRowState(transaction);
         else
             state = TableRowState::ERROR;
-        std::string itIsANumberRightQutionsmark = std::to_string(state).c_str();
+        changeColorOfRow(row, state);
         tblTransactions.setItem(row, TransactionColumns::STATUS, new QTableWidgetItem(std::to_string(state).c_str()));
         row++;
     }
@@ -161,6 +158,21 @@ void Transactions::createViewElements(){
     btnApplyChanges.setToolTip("Applies all changes of transactions (does not save to file)");
     btnApplyChanges.show();
 
+    btnSaveToFile.setParent(this);
+    btnSaveToFile.setText("Save to file");
+    btnSaveToFile.setToolTip("Saves transactions, accounts and transactionGroups to file");
+    btnSaveToFile.show();
+
+    btnLoadFromFile.setParent(this);
+    btnLoadFromFile.setText("Load from file");
+    btnLoadFromFile.setToolTip("Loads transactions, accounts and transactionGroups from file");
+    btnLoadFromFile.show();
+
+    btnViewGraph.setParent(this);
+    btnViewGraph.setText("View graph");
+    btnViewGraph.setToolTip("View graph of accumulated transactions over time");
+    btnViewGraph.show();
+
     tblTransactions.setParent(this);
     tblTransactions.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
     tblTransactions.setFixedHeight(300);
@@ -174,6 +186,9 @@ void Transactions::createViewElements(){
     layout->addWidget(&btnManageTransactionGroups);
     layout->addWidget(&btnApplyTransactionGroups);
     layout->addWidget(&btnApplyChanges);
+    layout->addWidget(&btnSaveToFile);
+    layout->addWidget(&btnLoadFromFile);
+    layout->addWidget(&btnViewGraph);
     this->setLayout(layout);
 
     this->show();
@@ -183,6 +198,9 @@ void Transactions::createViewElements(){
     QObject::connect(&btnManageTransactionGroups, &QPushButton::clicked, this, &Transactions::btnManageTransactionGroupsClick);
     QObject::connect(&btnApplyTransactionGroups, &QPushButton::clicked, this, &Transactions::btnApplyTransactionGroupsClick);
     QObject::connect(&btnApplyChanges, &QPushButton::clicked, this, &Transactions::btnApplyChangesClick);
+    QObject::connect(&btnSaveToFile, &QPushButton::clicked, this, &Transactions::btnSaveToFileClick);
+    QObject::connect(&btnLoadFromFile, &QPushButton::clicked, this, &Transactions::btnLoadFromFileClick);
+    QObject::connect(&btnViewGraph, &QPushButton::clicked, this, &Transactions::btnViewGraphClick);
 }
 
 void Transactions::tblTransactionsChanged(int row, int col){
@@ -210,7 +228,7 @@ void Transactions::calculateAndSetColorOfRow(int row, bool alwaysSetColor){
 
     // Convert row to transaction, check its status and if it differs from status column, change color of row
     core::Transaction transaction = rowToTransaction(row);
-    TableRowState::TableRowState stateFromCore = _core->getTableRowState(transaction);
+    TableRowState::TableRowState stateFromCore = _core->getTransactionTableRowState(transaction);
     if(stateFromTable != stateFromCore){
         statusItemPtr->setText(std::to_string(stateFromCore).c_str());
         changeColorOfRow(row, stateFromCore);
@@ -278,6 +296,29 @@ void Transactions::btnApplyChangesClick(bool checked){
     if(checkAllCellsFormat()){
         saveTransactionsToCore();
     }
+}
+
+void Transactions::btnSaveToFileClick(bool checked){
+    if(checked){}     //Remove warning "checked unused"
+
+    std::string fileName = QFileDialog::getSaveFileName(this, tr("Save to file"),"", tr("List files (*.ecv)")).toStdString();
+    if(!_core->saveToFile(fileName))
+        core::Utils::showErrorMessage("Could not save file");
+}
+
+void Transactions::btnLoadFromFileClick(bool checked){
+    if(checked){}     //Remove warning "checked unused"
+
+    std::string fileName = QFileDialog::getOpenFileName(this, tr("Load from file"),"", tr("List files (*.ecv)")).toStdString();
+    if(!_core->loadFromFile(fileName))
+        core::Utils::showErrorMessage("Could not load file");
+    else
+        _core->openTransactionsView(true);
+}
+
+void Transactions::btnViewGraphClick(bool checked){
+    if(checked){}     //Remove warning "checked unused"
+
 }
 
 }

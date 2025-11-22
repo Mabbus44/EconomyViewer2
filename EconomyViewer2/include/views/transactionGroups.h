@@ -28,6 +28,9 @@ public:
     QTableWidget tblTransactionGroups;
 private:
     void createViewElements();
+    void handleFieldChange(int row, int col);
+    void changeColorOfRow(int row, TableRowState::TableRowState state);
+    void tblTransactionGroupsChanged(int row, int col);
     core::EconomyViewer* _core=nullptr;
     std::map<unsigned int, core::TransactionGroup> _transactionGroups;
 

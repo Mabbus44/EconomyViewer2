@@ -150,6 +150,12 @@ std::string Utils::toString(std::tm date){
     return std::to_string(date.tm_year + 1900) + "-" + addLeadingZeroes(2, date.tm_mon) + "-" + addLeadingZeroes(2, date.tm_mday);
 }
 
+std::string Utils::toString(bool b){
+    if(b)
+        return "true";
+    return "false";
+}
+
 std::string Utils::toLower(std::string str){
     std::transform(str.begin(), str.end(), str.begin(),
                    [](unsigned char c){ return std::tolower(c); }
@@ -228,6 +234,12 @@ unsigned int Utils::toUInt(std::string str){
             break;   // If not number we return;
     }
     return ret;
+}
+
+bool Utils::toBool(std::string str){
+    if(toLower(str) == "true")
+        return true;
+    return false;
 }
 
 std::vector<std::tuple<int, int>> Utils::sortKeysByVal(std::map<int, int>& inputMap){

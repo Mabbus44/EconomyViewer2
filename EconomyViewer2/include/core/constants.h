@@ -4,11 +4,11 @@
 #include <QMessageBox>
 #include <ctime>
 
-
 namespace TransactionGroupColumns{ enum TransactionGroupColumns{
     GROUP_NAME,
     RULES,
     ID,
+    STATUS,
     COLUMN_COUNT,
 };}
 
@@ -122,10 +122,12 @@ public:
 
     static std::tm toDate(std::string str);
     static std::string toString(std::tm date);
+    static std::string toString(bool b);
     static std::string toLower(std::string str);
     static double toNum(std::string str);
     static int toInt(std::string str);
     static unsigned int toUInt(std::string str);
+    static bool toBool(std::string str);
 
     static std::vector<std::tuple<int, int>> sortKeysByVal(std::map<int, int>& inputMap);
 

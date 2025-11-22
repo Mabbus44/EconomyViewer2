@@ -3,6 +3,7 @@
 
 #include "../core/constants.h"
 #include "../core/transaction.h"
+#include "../../include/core/jsonNode.h"
 
 namespace core{
 
@@ -31,6 +32,9 @@ namespace core{
         std::string getCompareTypeString() const {return compareTypeToString(_compareType);}
         std::string getComparePropertyString() const {return comparePropertyToString(_compareProperty);}
         unsigned int id() const {return _id;}
+        bool fromJson(JsonNode node);
+        JsonNode toJson();
+        void clear() {};
 
         static std::string compareTypeToString(CompareType::CompareType compareType);
         static std::string comparePropertyToString(CompareProperty::CompareProperty compareProperty);

@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <string>
+#include "../../include/core/jsonNode.h"
 
 namespace core{
 
@@ -31,9 +32,12 @@ public:
     int transactionAmount();
     unsigned int getId();
     std::tm transactionDate();
+    bool fromJson(JsonNode node);
+    JsonNode toJson();
+    void clear();
 private:
     std::tm _transactionDate;
-    int _balance;   // Balance after transaction
+    int _balance;
     int _transactionAmount;
     unsigned int _id = 0;
     std::string _description = "";

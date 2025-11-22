@@ -27,6 +27,9 @@ public:
     QPushButton btnManageTransactionGroups;
     QPushButton btnApplyTransactionGroups;
     QPushButton btnApplyChanges;
+    QPushButton btnSaveToFile;
+    QPushButton btnLoadFromFile;
+    QPushButton btnViewGraph;
     QTableWidget tblTransactions;
 private:
     void createViewElements();
@@ -47,6 +50,9 @@ public slots:
     void btnManageTransactionGroupsClick(bool checked);
     void btnApplyTransactionGroupsClick(bool checked);
     void btnApplyChangesClick(bool checked);
+    void btnSaveToFileClick(bool checked);
+    void btnLoadFromFileClick(bool checked);
+    void btnViewGraphClick(bool checked);
 
 };
 

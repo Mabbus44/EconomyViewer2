@@ -52,11 +52,48 @@ void TransactionGroups::createViewElements(){
     this->setLayout(layout);
 
     this->show();
+    QObject::connect(&tblTransactionGroups, &QTableWidget::cellChanged, this, &TransactionGroups::tblTransactionGroupsChanged);
     QObject::connect(&btnAddNewGroup, &QPushButton::clicked, this, &TransactionGroups::btnAddNewGroupClick);
     QObject::connect(&btnDeleteGroup, &QPushButton::clicked, this, &TransactionGroups::btnDeleteGroupClick);
     QObject::connect(&btnEditGroup, &QPushButton::clicked, this, &TransactionGroups::btnEditGroupClick);
     QObject::connect(&btnSaveChanges, &QPushButton::clicked, this, &TransactionGroups::btnSaveChangesClick);
     QObject::connect(&btnCancel, &QPushButton::clicked, this, &TransactionGroups::btnCancelClick);
+}
+
+void TransactionGroups::handleFieldChange(int row, int col){
+    if(col == TransactionGroupColumns::GROUP_NAME){
+        QTableWidgetItem* groupNamePtr = tblTransactionGroups.item(row, TransactionGroupColumns::GROUP_NAME);
+        QTableWidgetItem* statusItemPtr = tblTransactionGroups.item(row, TransactionGroupColumns::STATUS);
+        QTableWidgetItem* idPtr = tblTransactionGroups.item(row, TransactionGroupColumns::ID);
+        if(groupNamePtr == nullptr || statusItemPtr == nullptr || idPtr == nullptr)
+            return;
+        std::string groupName = groupNamePtr->text().toStdString();
+        auto stateFromTable = (TableRowState::TableRowState)(core::Utils::toInt(statusItemPtr->text().toStdString()));
+        int id = core::Utils::toInt(idPtr->text().toStdString());
+        if(!_transactionGroups.count(id))
+            return; //Shuold not be possible
+        _transactionGroups[id].groupName(groupName);
+        TableRowState::TableRowState stateFromCore = _core->getTransactionGroupTableRowState(_transactionGroups[id]);
+        if(stateFromTable != stateFromCore){
+            tblTransactionGroups.item(row, TransactionGroupColumns::STATUS)->setText(std::to_string(stateFromCore).c_str());
+            changeColorOfRow(row, stateFromCore);
+        }
+    }
+}
+
+void TransactionGroups::changeColorOfRow(int row, TableRowState::TableRowState state){
+    QBrush color = Qt::transparent;
+    if(state == TableRowState::UNCHANGED)
+        color = Qt::transparent;
+    else if(state == TableRowState::CHANGED)
+        color = Qt::yellow;
+    else if(state == TableRowState::NEW)
+        color = Qt::green;
+    else if(state == TableRowState::ERROR)
+        color = Qt::red;
+    for(int col=0; col<TransactionGroupColumns::COLUMN_COUNT; col++)
+        if(col != TransactionGroupColumns::ID && col != TransactionGroupColumns::STATUS)
+            tblTransactionGroups.item(row, col)->setBackground(color);
 }
 
 bool TransactionGroups::openView(){
@@ -75,6 +112,7 @@ bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>&
     tblTransactionGroups.setRowCount(_transactionGroups.size());
     tblTransactionGroups.setColumnCount(TransactionGroupColumns::COLUMN_COUNT);
     tblTransactionGroups.hideColumn(TransactionGroupColumns::ID);
+    tblTransactionGroups.hideColumn(TransactionGroupColumns::STATUS);
     tblTransactionGroups.setHorizontalHeaderLabels({"Group name","Rules"});
 
     int row = 0;
@@ -82,11 +120,16 @@ bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>&
         tblTransactionGroups.setItem(row, TransactionGroupColumns::GROUP_NAME, new QTableWidgetItem(mapEntry.second.groupName().c_str()));
         tblTransactionGroups.setItem(row, TransactionGroupColumns::RULES, new QTableWidgetItem(std::to_string(mapEntry.second.conditionCount()).c_str()));
         tblTransactionGroups.setItem(row, TransactionGroupColumns::ID, new QTableWidgetItem(std::to_string(mapEntry.second.id()).c_str()));
+        tblTransactionGroups.setItem(row, TransactionGroupColumns::STATUS, new QTableWidgetItem(std::to_string(TableRowState::UNCHANGED).c_str()));
         row++;
     }
     tblTransactionGroups.resizeColumnsToContents();
     this->show();
     return true;
+}
+
+void TransactionGroups::tblTransactionGroupsChanged(int row, int col){
+    handleFieldChange(row, col);
 }
 
 void TransactionGroups::btnAddNewGroupClick(bool checked){

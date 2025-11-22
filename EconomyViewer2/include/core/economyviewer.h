@@ -51,9 +51,14 @@ public:
     void updateAccounts(std::vector<Account>& updatedAccounts);
     void updateTransactions(std::vector<Transaction>& updatedTransactions);
     void updateTransactionGroups(std::map<unsigned int, core::TransactionGroup>& updatedTransactionGroups);
+    bool saveToFile(std::string fileName);
+    bool loadFromFile(std::string fileName);
+    bool fromJson(JsonNode node);
+    void clear();
     unsigned int getUniqueTransactionId();
     unsigned int getUniqueTransactionGroupId();
-    TableRowState::TableRowState getTableRowState(core::Transaction& transaction);
+    TableRowState::TableRowState getTransactionTableRowState(core::Transaction& transaction);
+    TableRowState::TableRowState getTransactionGroupTableRowState(core::TransactionGroup& transactionGroup);
     std::map<unsigned int, core::TransactionGroup>& transactionGroupsRef() {return _transactionGroups;};
 
 private:
