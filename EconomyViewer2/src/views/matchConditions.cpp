@@ -2,6 +2,7 @@
 #include "../../include/views/matchConditions.h"
 #include <QSizePolicy>
 #include <QLayout>
+#include <QHeaderView>
 
 namespace views{
 
@@ -33,9 +34,7 @@ void MatchConditions::createViewElements(){
     btnSaveChanges.show();
 
     tblMatchConditions.setParent(this);
-    tblMatchConditions.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    tblMatchConditions.setFixedHeight(300);
-    tblMatchConditions.setFixedWidth(500);
+    tblMatchConditions.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tblMatchConditions.show();
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -55,6 +54,7 @@ void MatchConditions::createViewElements(){
 }
 
 bool MatchConditions::openView(core::TransactionGroup& transactionGroup){
+    _core->layout->setCurrentWidget(this);
     _transactionGroup = transactionGroup;
     tblMatchConditions.setRowCount(_transactionGroup.conditionCount());
     tblMatchConditions.setColumnCount(MatchConditionColumns::COLUMN_COUNT);
@@ -67,8 +67,6 @@ bool MatchConditions::openView(core::TransactionGroup& transactionGroup){
         setTableRow(row, mapEntry.second);
         row++;
     }
-
-    this->show();
     return true;
 }
 

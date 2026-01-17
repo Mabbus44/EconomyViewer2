@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QSizePolicy>
 #include <QLayout>
+#include <QHeaderView>
 
 namespace views{
 
@@ -24,9 +25,7 @@ void NewTransactions::createViewElements(){
     btnSaveTransactions.setToolTip("Saves the loaded transactions to the main transaction pool");
     btnSaveTransactions.show();
     tblNewTransactions.setParent(this);
-    tblNewTransactions.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    tblNewTransactions.setFixedHeight(300);
-    tblNewTransactions.setFixedWidth(500);
+    tblNewTransactions.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tblNewTransactions.show();
     cmbAccounts.setParent(this);
     cmbAccounts.show();
@@ -46,8 +45,8 @@ bool NewTransactions::openView(std::vector<core::Account>& accounts, bool loadFi
     if(loadFileDialog)
         ret = loadTransactions();
     if(ret){
+        _core->layout->setCurrentWidget(this);
         loadAccounts(accounts);
-        this->show();
     }
     return ret;
 }
@@ -57,7 +56,7 @@ bool NewTransactions::openView(bool loadFileDialog){
     if(loadFileDialog)
         ret = loadTransactions();
     if(ret)
-        this->show();
+        _core->layout->setCurrentWidget(this);
     return ret;
 }
 
@@ -315,6 +314,8 @@ bool NewTransactions::loadTransactions(){
         row++;
     }
     tblNewTransactions.resizeColumnsToContents();
+    tblNewTransactions.horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    tblNewTransactions.horizontalHeader()->setStretchLastSection(true);
     checkCellFormat();
     return true;
 }

@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QFrame>
+#include <QStackedLayout>
 #include <map>
 #include "../core/account.h"
 #include "../core/constants.h"
@@ -13,6 +14,7 @@
 #include "../views/accounts.h"
 #include "../views/transactionGroups.h"
 #include "../views/matchConditions.h"
+#include "../views/graph.h"
 
 namespace views{
 class Transactions;
@@ -20,6 +22,7 @@ class NewTransactions;
 class Accounts;
 class TransactionGroups;
 class MatchConditions;
+class Graph;
 }
 
 namespace core{
@@ -38,6 +41,8 @@ public:
     QScopedPointer<views::Accounts> accountsView;
     QScopedPointer<views::TransactionGroups> transactionGroupsView;
     QScopedPointer<views::MatchConditions> matchConditionsView;
+    QScopedPointer<views::Graph> graphView;
+    QScopedPointer<QStackedLayout> layout;
     QScopedPointer<QFrame> window;
 
     void openTransactionsViewAndAddTransactions(std::vector<Transaction>& transactions);
@@ -47,6 +52,7 @@ public:
     void openTransactionGroupsView(bool useCoreTransactionGroupsVector = false);
     void openTransactionGroupsView(std::map<unsigned int, core::TransactionGroup>& transactionGroups);
     void openMatchConditionsView(core::TransactionGroup& transactionGroup);
+    void openGraphView();
 
     void updateAccounts(std::vector<Account>& updatedAccounts);
     void updateTransactions(std::vector<Transaction>& updatedTransactions);
@@ -55,6 +61,8 @@ public:
     bool loadFromFile(std::string fileName);
     bool fromJson(JsonNode node);
     void clear();
+    const std::map<unsigned int, Transaction>& getTransactionsRef() {return _transactions;}
+
     unsigned int getUniqueTransactionId();
     unsigned int getUniqueTransactionGroupId();
     TableRowState::TableRowState getTransactionTableRowState(core::Transaction& transaction);

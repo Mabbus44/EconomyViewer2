@@ -27,7 +27,8 @@ namespace ViewNames{ enum ViewNames{
     NEW_TRANSACTIONS,
     MANAGE_ACCOUNTS,
     TRANSACTIONS_GROUPS,
-    MATCH_CONDITIONS
+    MATCH_CONDITIONS,
+    GRAPH
 };}
 
 namespace TransactionColumns{ enum TransactionColumns{

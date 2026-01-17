@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QSizePolicy>
 #include <QLayout>
+#include <QHeaderView>
 
 namespace views{
 
@@ -30,9 +31,7 @@ void Accounts::createViewElements(){
     btnSaveChanges.show();
 
     tblAccounts.setParent(this);
-    tblAccounts.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    tblAccounts.setFixedHeight(300);
-    tblAccounts.setFixedWidth(500);
+    tblAccounts.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tblAccounts.show();
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -49,11 +48,12 @@ void Accounts::createViewElements(){
 }
 
 bool Accounts::openView(){
-    this->show();
+    _core->layout->setCurrentWidget(this);
     return true;
 }
 
 bool Accounts::openView(std::vector<core::Account>& accounts){
+    _core->layout->setCurrentWidget(this);
     tblAccounts.setRowCount(accounts.size());
     tblAccounts.setColumnCount(2);
     tblAccounts.setHorizontalHeaderLabels({"Name","Account number"});
@@ -64,7 +64,8 @@ bool Accounts::openView(std::vector<core::Account>& accounts){
         row++;
     }
     tblAccounts.resizeColumnsToContents();
-    this->show();
+    tblAccounts.horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    tblAccounts.horizontalHeader()->setStretchLastSection(true);
     return true;
 }
 

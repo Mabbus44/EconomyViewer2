@@ -3,59 +3,44 @@
 #include "../../include/core/jsonNode.h"
 #include <QMessageBox>
 #include <fstream>
+#include <QStackedLayout>
 
 namespace core{
 
 EconomyViewer::EconomyViewer() {
-    /* Test passed, save it until next git commit just in case
-    JsonNode root, hits, total, hitsArray, hitsArray1, source, cats, catNames;
-    catNames.addToArray("Möbler");
-    catNames.addToArray("Stol");
-    catNames.addToArray("Elevstol");
-    cats.addToArray("44212");
-    cats.addToArray("44210");
-    cats.addToArray("44160");
-    source.addToObject("agreementProposalSortOrder", "0");
-    source.addToObject("categories", cats);
-    source.addToObject("categoryNames", catNames);
-    source.addToObject("description", "Elevstol Leon 1, högtryckslaminat ");
-    source.addToObject("entityId", "44872");
-    hitsArray1.addToObject("_index", "ecom_dev_product_sv_se_202511080651");
-    hitsArray1.addToObject("_type", "_doc");
-    hitsArray1.addToObject("_id", "P7055030_7055030");
-    hitsArray1.addToObject("_score", "1.0");
-    hitsArray1.addToObject("_source", source);
-    hitsArray.addToArray(hitsArray1);
-    total.addToObject("value", "4");
-    total.addToObject("relation", "eq");
-    hits.addToObject("total", total);
-    hits.addToObject("max_score", "1.0");
-    hits.addToObject("hits", hitsArray);
-    root.addToObject("hits", hits);
-    std::string json = root.getJson();*/
 }
 
 int EconomyViewer::run(int argc, char **argv) {
     QApplication app (argc, argv);
     window.reset(new QFrame());
+
+    transactionsView.reset(new views::Transactions(window.get(), this));
+    newTransactionsView.reset(new views::NewTransactions(window.get(), this));
+    accountsView.reset(new views::Accounts(window.get(), this));
+    transactionGroupsView.reset(new views::TransactionGroups(window.get(), this));
+    matchConditionsView.reset(new views::MatchConditions(window.get(), this));
+    graphView.reset(new views::Graph(window.get(), this));
+
+    layout.reset(new QStackedLayout(window.get()));
+    layout->addWidget(transactionsView.get());
+    layout->addWidget(newTransactionsView.get());
+    layout->addWidget(accountsView.get());
+    layout->addWidget(transactionGroupsView.get());
+    layout->addWidget(matchConditionsView.get());
+    layout->addWidget(graphView.get());
+
+    window->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     window->resize(600, 800);
     window->show();
 
-    transactionsView.reset(new views::Transactions(window.get(), this));
-    transactionsView->openView();
+    layout->setCurrentWidget(transactionsView.get());
     currentView = ViewNames::TRANSACTIONS;
-
-    newTransactionsView.reset(new views::NewTransactions(window.get(), this));
+    transactionsView->openView();
     newTransactionsView->hide();
-
-    accountsView.reset(new views::Accounts(window.get(), this));
     accountsView->hide();
-
-    transactionGroupsView.reset(new views::TransactionGroups(window.get(), this));
     transactionGroupsView->hide();
-
-    matchConditionsView.reset(new views::MatchConditions(window.get(), this));
     matchConditionsView->hide();
+    graphView->hide();
 
     return app.exec();
 }
@@ -76,6 +61,9 @@ void EconomyViewer::closeCurrentView(){
         break;
     case ViewNames::MATCH_CONDITIONS:
         matchConditionsView->hide();
+        break;
+    case ViewNames::GRAPH:
+        graphView->hide();
         break;
     default:
         break;
@@ -120,14 +108,12 @@ void EconomyViewer::openTransactionGroupsView(bool useCoreTransactionGroupsVecto
         transactionGroupsView->openView(_transactionGroups);
     else
         transactionGroupsView->openView();
-
     currentView = ViewNames::TRANSACTIONS_GROUPS;
 }
 
 void EconomyViewer::openTransactionGroupsView(std::map<unsigned int, core::TransactionGroup>& transactionGroups){
     closeCurrentView();
     transactionGroupsView->openView(transactionGroups, true);
-
     currentView = ViewNames::TRANSACTIONS_GROUPS;
 }
 
@@ -135,6 +121,12 @@ void EconomyViewer::openMatchConditionsView(core::TransactionGroup& transactionG
     closeCurrentView();
     matchConditionsView->openView(transactionGroup);
     currentView = ViewNames::MATCH_CONDITIONS;
+}
+
+void EconomyViewer::openGraphView(){
+    closeCurrentView();
+    graphView->openView();
+    currentView = ViewNames::GRAPH;
 }
 
 void EconomyViewer::updateAccounts(std::vector<Account>& updatedAccounts){

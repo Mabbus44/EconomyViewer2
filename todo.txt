@@ -1,11 +1,13 @@
 TODO:
 MVP
-* View graph page
-* Select transaction groups on view graph page
-* Select start/end date on view graph page
-* Show graph on view graph page
+* Create graph settings page
+* Select transaction groups on graph settings page
+* Select start/end date on graph settings page
+* Select group data per day or month on graph settings page
 
 Others
+* Autoload from file
+* "unsaved changes" warning when closing program
 * And "and" functionality for a transactiongroup that selects a list of matchConditions and "and"s them instead of the default "or"
 * Add button on matchconditions page to "and" selected matchConditions
 * Add uneditable column "and group" to match conditions page. so you can see which match conditions belong together
@@ -21,6 +23,14 @@ Others
 * Yellow/green colors for changed/new fields in transactionGroupsView
 
 done
+
+v0.08
+* View graph page
+* Made tables and graph fit window
+* Made columns fit table
+* Show graph on view graph page
+
+v0.07
 * Save to file
 * Load from file
 * Transactions are green right after load

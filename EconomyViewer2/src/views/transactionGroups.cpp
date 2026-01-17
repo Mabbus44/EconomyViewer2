@@ -2,6 +2,7 @@
 #include "../../include/views/transactionGroups.h"
 #include <QSizePolicy>
 #include <QLayout>
+#include <QHeaderView>
 
 namespace views{
 
@@ -37,9 +38,7 @@ void TransactionGroups::createViewElements(){
     btnSaveChanges.show();
 
     tblTransactionGroups.setParent(this);
-    tblTransactionGroups.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    tblTransactionGroups.setFixedHeight(300);
-    tblTransactionGroups.setFixedWidth(500);
+    tblTransactionGroups.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tblTransactionGroups.show();
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -102,6 +101,7 @@ bool TransactionGroups::openView(){
 }
 
 bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>& transactionGroups, bool appendTransactionGroups){
+    _core->layout->setCurrentWidget(this);
     if(appendTransactionGroups){
         for(auto& mapEntry: transactionGroups)
             _transactionGroups[mapEntry.first] = mapEntry.second;
@@ -124,7 +124,8 @@ bool TransactionGroups::openView(std::map<unsigned int, core::TransactionGroup>&
         row++;
     }
     tblTransactionGroups.resizeColumnsToContents();
-    this->show();
+    tblTransactionGroups.horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    tblTransactionGroups.horizontalHeader()->setStretchLastSection(true);
     return true;
 }
 

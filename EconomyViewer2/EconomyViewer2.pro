@@ -3,8 +3,8 @@ TARGET = EconomyViewer
 
 QT = core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
+QT += charts
 CONFIG += c++20
 
 INCLUDEPATH += include
@@ -19,6 +19,7 @@ SOURCES += \
   src/core/transaction.cpp \
   src/core/transactionGroup.cpp \
   src/views/accounts.cpp \
+  src/views/graph.cpp \
   src/views/matchConditions.cpp \
   src/views/newtransactions.cpp \
   src/views/transactionGroups.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
   include/core/transaction.h \
   include/core/transactionGroup.h \
   include/views/accounts.h \
+  include/views/graph.h \
   include/views/matchConditions.h \
   include/views/newtransactions.h \
   include/views/transactionGroups.h \

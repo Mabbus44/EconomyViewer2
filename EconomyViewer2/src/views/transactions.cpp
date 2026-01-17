@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QLayout>
 #include <QFileDialog>
+#include <QHeaderView>
 
 namespace views{
 
@@ -19,7 +20,7 @@ Transactions::Transactions(QWidget* parent, core::EconomyViewer* core):QFrame(pa
 }
 
 bool Transactions::openView(){
-    this->show();
+    _core->layout->setCurrentWidget(this);
     return true;
 }
 
@@ -31,6 +32,7 @@ bool Transactions::openView(std::map<unsigned int, core::Transaction>& transacti
 }
 
 bool Transactions::openView(std::vector<core::Transaction>& transactions, bool appendTransactions){
+    _core->layout->setCurrentWidget(this);
     int row = 0;
     if(!appendTransactions || tblTransactions.rowCount() <= 0){
         tblTransactions.setRowCount(transactions.size());
@@ -61,7 +63,8 @@ bool Transactions::openView(std::vector<core::Transaction>& transactions, bool a
         row++;
     }
     tblTransactions.resizeColumnsToContents();
-    this->show();
+    tblTransactions.horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    tblTransactions.horizontalHeader()->setStretchLastSection(true);
     return true;
 }
 
@@ -174,9 +177,7 @@ void Transactions::createViewElements(){
     btnViewGraph.show();
 
     tblTransactions.setParent(this);
-    tblTransactions.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
-    tblTransactions.setFixedHeight(300);
-    tblTransactions.setFixedWidth(500);
+    tblTransactions.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     tblTransactions.show();
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -318,7 +319,7 @@ void Transactions::btnLoadFromFileClick(bool checked){
 
 void Transactions::btnViewGraphClick(bool checked){
     if(checked){}     //Remove warning "checked unused"
-
+    _core->openGraphView();
 }
 
 }
